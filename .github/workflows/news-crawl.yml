@@ -1,0 +1,35 @@
+name: News‑Crawl‑Job
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu‑latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set‑up Python
+        uses: actions/setup‑python@v5
+        with:
+          python‑version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install feedparser requests
+
+      - name: Run news extract script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python scripts/fetch_and_extract.py
+
+      - name: Save generated articles
+        run: |
+          git config --global user.name "github‑action‑bot"
+          git config --global user.email "bot@example.com"
+          git add -A
+          git commit -m "Auto‑update news articles" || echo "No new changes"
+          git push
