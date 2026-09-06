@@ -18,13 +18,16 @@ if not GROQ_KEY:
     print("FATAL: GROQ_API_KEY is empty.")
     sys.exit(1)
 
-# 自动检测可用模型
-GROQ_MODELS = [
-    "llama-3.1-70b-versatile",
+# 按优先级排序的模型候选（从 Groq 可用列表中自动匹配）
+MODEL_PRIORITY = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "groq/compound",
+    "groq/compound-mini",
+    "canopylabs/orpheus-v1-english",
     "llama-3.3-70b-versatile",
+    "llama-3.1-70b-versatile",
     "mixtral-8x7b-32768",
-    "llama-3.1-8b-instant",
-    "gemma2-9b-it",
 ]
 ACTIVE_MODEL = None
 
@@ -37,19 +40,30 @@ def detect_model():
             timeout=30
         )
         if resp.status_code == 200:
-            available = {m["id"] for m in resp.json().get("data", [])}
-            print(f"Groq available models: {sorted(available)[:10]}...")
-            for m in GROQ_MODELS:
-                if m in available:
+            available = [m["id"] for m in resp.json().get("data", [])]
+            print(f"Groq available models ({len(available)}):")
+            for m in available:
+                print(f"  - {m}")
+            # 按优先级匹配
+            for candidate in MODEL_PRIORITY:
+                if candidate in available:
+                    ACTIVE_MODEL = candidate
+                    print(f"\nSelected model: {ACTIVE_MODEL}")
+                    return
+            # 都没匹配到，选第一个非 guard/safeguard 的通用模型
+            for m in available:
+                low = m.lower()
+                if "guard" not in low and "safeguard" not in low and "prompt-guard" not in low and "arabic" not in low and "saudi" not in low:
                     ACTIVE_MODEL = m
-                    print(f"Using model: {ACTIVE_MODEL}")
+                    print(f"\nFallback selected model: {ACTIVE_MODEL}")
                     return
         else:
             print(f"Model list query failed: {resp.status_code} {resp.text[:200]}")
     except Exception as e:
         print(f"Model detection error: {e}")
-    ACTIVE_MODEL = GROQ_MODELS[0]
-    print(f"Fallback to model: {ACTIVE_MODEL}")
+    if not ACTIVE_MODEL:
+        ACTIVE_MODEL = "openai/gpt-oss-120b"
+        print(f"Hardcoded fallback model: {ACTIVE_MODEL}")
 
 detect_model()
 
@@ -79,7 +93,7 @@ def llm_extract(full_text):
     try:
         resp = requests.post(url, json=payload, headers=headers, timeout=180)
         if resp.status_code != 200:
-            print(f"    Groq HTTP {resp.status_code}: {resp.text[:300]}")
+            print(f"    Groq HTTP {resp.status_code}: {resp.text[:400]}")
             return None
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
@@ -123,9 +137,7 @@ for category, rss_list in sources.items():
             feed = feedparser.parse(feed_url)
             entries = feed.entries
             if not entries:
-                print(f"  警告：该RSS源没有返回任何条目 (bozo={feed.bozo})")
-                if feed.bozo_exception:
-                    print(f"    原因: {feed.bozo_exception}")
+                print(f"  警告：该RSS源没有返回任何条目")
                 continue
             print(f"  获取到 {len(entries)} 条条目")
             for entry in entries[:10]:
