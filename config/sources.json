@@ -1,21 +1,21 @@
 {
-  "AI科技": [
-    "https://techcrunch.com/feed/",
-    "https://www.theverge.com/rss/index.xml",
-    "https://venturebeat.com/feed/"
-  ],
-  "国外搞钱": [
+  "AI赚钱玩法": [
     "https://www.sidehustlenation.com/feed/",
     "https://www.smartpassiveincome.com/feed/",
-    "https://neilpatel.com/blog/feed/"
+    "https://neilpatel.com/blog/feed/",
+    "https://www.matthewwoodward.co.uk/feed/"
   ],
-  "YouTube/TikTok": [
-    "https://blog.youtube/feed/",
-    "https://newsroom.tiktok.com/en-us/rss.xml"
+  "AI工具实操": [
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "https://venturebeat.com/category/ai/feed/",
+    "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
   ],
-  "跨境电商": [
+  "跨境/独立站": [
     "https://www.ecommercebytes.com/feed/",
-    "https://www.shopify.com/blog/feed.xml",
-    "https://feeds.feedburner.com/typeamommy/Ecommerce"
+    "https://www.shopify.com/blog/feed.xml"
+  ],
+  "YouTube/内容创作": [
+    "https://blog.youtube/feed/",
+    "https://creatorhub.youtube/feed/"
   ]
 }
