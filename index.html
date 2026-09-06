@@ -48,7 +48,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .style-btn { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; cursor: pointer; background: white; transition: all 0.15s; }
 .style-btn:hover { border-color: #667eea; color: #667eea; }
 .style-btn.active { background: #667eea; color: white; border-color: #667eea; }
-.rewrite-output { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 10px; min-height: 100px; white-space: pre-wrap; font-size: 14px; line-height: 1.8; display: none; }
+.rewrite-output { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-top: 10px; min-height: 100px; white-space: pre-wrap; word-break: break-word; font-size: 15px; line-height: 2; display: none; }
 .rewrite-output.show { display: block; }
 .loading { text-align: center; padding: 20px; color: #999; font-size: 13px; }
 .empty-state { text-align: center; padding: 60px 20px; color: #999; }
@@ -138,12 +138,12 @@ let currentStyle = 'shortvideo';
 
 // 改写风格提示词
 const STYLE_PROMPTS = {
-  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。要求：1）标题必须有钩子，用悬念/反差/数字/痛点，比如"我没花一分钱，却靠这个工具月入5位数""你天天用的软件，藏着个赚钱功能没人知道"；2）前5秒必须抛出反常识或痛点；3）口语化，像跟朋友聊天，不要书面语；4）只说最干的货，不要废话；5）结尾留互动引导。输出纯文本，不要用任何markdown符号、星号、井号、特殊符号，直接写正文。',
-  xiaohongshu: '把下面这篇文章改写成小红书笔记。要求：1）标题20字以内，必须有钩子+emoji，用数字/反差/痛点，比如"3个AI工具，让我每天多赚200块😭""别再瞎忙了！这个方法才是真赚钱"；2）正文分点用emoji标号，语言活泼接地气；3）多用"姐妹们""绝了""谁懂啊"这种词；4）结尾加3-5个话题标签。输出纯文本，不要用任何markdown符号、星号、井号，直接写正文。',
-  gongzhonghao: '把下面这篇文章改写成公众号文章。要求：1）标题必须有吸引力，用悬念/数字/反差，比如"那个靠AI月入10万的普通人，做对了什么？"；2）开头场景化引入，制造痛点或好奇；3）正文分小标题，逻辑清晰有深度；4）结尾总结+行动号召；5）语言专业但不枯燥。输出纯文本，不要用任何markdown符号、星号、井号，直接写正文，段落用空行分隔。',
-  zhihu: '把下面这篇文章改写成知乎回答风格。要求：1）开头直接抛出观点或"谢邀"；2）正文分点论证，有数据有案例；3）逻辑严谨，语言理性客观；4）结尾总结。输出纯文本，不要用任何markdown符号、星号、井号，直接写正文。',
-  tweet: '把下面这篇文章改写成3-5条推特/微博线程。要求：1）第一条抓眼球，用悬念或数字；2）中间逐条展开干货；3）最后一条总结+互动；4）每条不超过140字；5）用数字和emoji分隔。输出纯文本，不要用任何markdown符号、星号、井号。',
-  summary: '把下面这篇文章压缩成3句话的超精简摘要。要求：1）第一句说核心事件；2）第二句说关键数据/方法；3）第三句说对普通人的意义。输出纯文本，不要用任何markdown符号、星号、井号。'
+  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。\n\n严格要求：\n1. 第一行是标题（有钩子，用悬念/反差/数字/痛点）\n2. 第二行空一行\n3. 正文分成2-3个小段落，每段之间空一行\n4. 前5秒必须有钩子，口语化，像跟朋友聊天\n5. 结尾留互动引导\n6. 不要用任何markdown符号、星号、井号、特殊符号，直接写纯文本，段落之间用空行分隔',
+  xiaohongshu: '把下面这篇文章改写成小红书笔记。\n\n严格要求：\n1. 第一行是标题（20字以内，有钩子+emoji，用数字/反差/痛点）\n2. 第二行空一行\n3. 正文分成3-5个小点，每个点用emoji开头，点与点之间空一行\n4. 语言活泼接地气，多用"姐妹们""绝了""谁懂啊"\n5. 最后一行是3-5个话题标签（#标签1 #标签2）\n6. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
+  gongzhonghao: '把下面这篇文章改写成公众号文章。\n\n严格要求：\n1. 第一行是文章标题（有吸引力，用悬念/数字/反差）\n2. 第二行空一行\n3. 正文分成3-5个小标题段落，每个小标题单独一行，后面跟正文，段落之间空一行\n4. 开头场景化引入，制造痛点或好奇\n5. 结尾总结+行动号召\n6. 语言专业但不枯燥\n7. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
+  zhihu: '把下面这篇文章改写成知乎回答风格。\n\n严格要求：\n1. 第一行是标题或核心观点\n2. 第二行空一行\n3. 正文分成3-5个论点，每个论点有小标题，段落之间空一行\n4. 有数据有案例，逻辑严谨\n5. 结尾总结\n6. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
+  tweet: '把下面这篇文章改写成3-5条推特/微博线程。\n\n严格要求：\n1. 每条单独一段，条与条之间空一行\n2. 第一条抓眼球，用悬念或数字\n3. 中间逐条展开干货\n4. 最后一条总结+互动\n5. 每条不超过140字，用数字和emoji分隔\n6. 不要用任何markdown符号、星号、井号，直接写纯文本',
+  summary: '把下面这篇文章压缩成3句话的超精简摘要。\n\n严格要求：\n1. 第一句说核心事件\n2. 第二句说关键数据/方法\n3. 第三句说对普通人的意义\n4. 三句话之间空一行\n5. 不要用任何markdown符号、星号、井号，直接写纯文本'
 };
 
 // 初始化
@@ -314,11 +314,13 @@ function switchTab(tab) {
 
 function cleanText(text) {
   return text
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
     .replace(/[\u200B-\u200F\u2028-\u202F\uFEFF]/g, '')
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
-    .replace(/[*_`#>~]/g, '')
-    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
+    .replace(/^[ \t]+/gm, '')
     .replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
