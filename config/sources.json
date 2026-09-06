@@ -1,8 +1,8 @@
 {
   "AI科技": [
-    "https://techcrunch.com/category/artificial-intelligence/feed/",
-    "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-    "https://venturebeat.com/category/ai/feed/"
+    "https://techcrunch.com/feed/",
+    "https://www.theverge.com/rss/index.xml",
+    "https://venturebeat.com/feed/"
   ],
   "国外搞钱": [
     "https://www.sidehustlenation.com/feed/",
@@ -11,10 +11,11 @@
   ],
   "YouTube/TikTok": [
     "https://blog.youtube/feed/",
-    "https://newsroom.tiktok.com/en-us/rss"
+    "https://newsroom.tiktok.com/en-us/rss.xml"
   ],
   "跨境电商": [
+    "https://www.ecommercebytes.com/feed/",
     "https://www.shopify.com/blog/feed.xml",
-    "https://www.ecommercebytes.com/feed/"
+    "https://feeds.feedburner.com/typeamommy/Ecommerce"
   ]
 }
