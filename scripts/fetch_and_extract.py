@@ -171,8 +171,11 @@ for category, rss_list in sources.items():
 {extracted_content}
 """
                     all_results.append((title, article_markdown, link))
-                    article_count += 1
-                    print(f"  ✅ 完成第 {article_count}/{MAX_ARTICLES} 条")
+                    if "【跳过】" not in article_markdown:
+                        article_count += 1
+                        print(f"  ✅ 完成第 {article_count}/{MAX_ARTICLES} 条")
+                    else:
+                        print(f"  ⏭️  跳过（无实操价值）")
                     time.sleep(2)
                 except Exception as e:
                     print(f"  ❌ 处理失败：{e}")
@@ -183,6 +186,10 @@ for category, rss_list in sources.items():
             continue
 
 for idx, (title, md, link) in enumerate(all_results):
+    if "【跳过】" in md:
+        print(f"  跳过保存（无实操价值）: {title}")
+        processed.add(link)
+        continue
     safe_name = re.sub(r'[^\w]','_',title)[:60] + ".md"
     out_file = OUTPUT_FOLDER / safe_name
     with open(out_file, "w", encoding="utf-8") as f:
