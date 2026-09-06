@@ -1,22 +1,21 @@
 {
-  "AI工具实操": [
-    "https://www.futuretools.io/rss",
-    "https://theresanaiforthat.com/rss/",
-    "https://venturebeat.com/category/ai/feed/"
+  "AI工具与玩法": [
+    "https://venturebeat.com/category/ai/feed/",
+    "https://techcrunch.com/category/artificial-intelligence/feed/"
   ],
-  "普通人搞钱": [
+  "普通人搞钱/副业": [
     "https://www.sidehustlenation.com/feed/",
     "https://www.smartpassiveincome.com/feed/",
     "https://neilpatel.com/blog/feed/",
     "https://www.matthewwoodward.co.uk/feed/",
-    "https://problogger.com/feed/"
+    "https://problogger.com/feed/",
+    "https://www.nichepursuits.com/feed/"
   ],
   "内容创作/自媒体": [
-    "https://www.vidiq.com/blog/feed/",
     "https://blog.youtube/feed/",
     "https://www.tubefilter.com/feed/"
   ],
-  "出海/跨境赚钱": [
+  "跨境/独立站": [
     "https://www.ecommercebytes.com/feed/",
     "https://www.shopify.com/blog/feed.xml"
   ]
