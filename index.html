@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外搞钱资讯 - 抓取 & 改写工具</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
+.header h1 { font-size: 22px; margin-bottom: 6px; }
+.header p { font-size: 13px; opacity: 0.9; }
+.container { max-width: 1200px; margin: 0 auto; padding: 16px; display: flex; gap: 16px; }
+.sidebar { width: 320px; flex-shrink: 0; }
+.main { flex: 1; min-width: 0; }
+.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card h3 { font-size: 15px; margin-bottom: 10px; color: #333; }
+.setting-row { margin-bottom: 10px; }
+.setting-row label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+.setting-row input, .setting-row select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+.setting-row input:focus, .setting-row select:focus { outline: none; border-color: #667eea; }
+.btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #667eea; color: white; }
+.btn-primary:hover { background: #5568d3; }
+.btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+.btn-secondary { background: #f0f0f0; color: #333; }
+.btn-secondary:hover { background: #e0e0e0; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.article-list { max-height: calc(100vh - 300px); overflow-y: auto; }
+.article-item { padding: 10px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: background 0.15s; }
+.article-item:hover { background: #f5f5f7; }
+.article-item.active { background: #eef0ff; }
+.article-item .title { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 3px; }
+.article-item .meta { font-size: 11px; color: #999; }
+.article-content { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); min-height: 400px; }
+.article-content h1 { font-size: 22px; margin-bottom: 8px; line-height: 1.4; }
+.article-content .article-meta { font-size: 12px; color: #888; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+.article-content .article-meta a { color: #667eea; text-decoration: none; }
+.article-content h2 { font-size: 17px; margin: 18px 0 8px; color: #333; }
+.article-content p { font-size: 14px; line-height: 1.8; margin-bottom: 10px; color: #444; }
+.article-content ul, .article-content ol { margin: 8px 0 12px 20px; }
+.article-content li { font-size: 14px; line-height: 1.8; margin-bottom: 4px; color: #444; }
+.article-content table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+.article-content th, .article-content td { border: 1px solid #ddd; padding: 8px; font-size: 13px; text-align: left; }
+.article-content th { background: #f5f5f7; }
+.rewrite-panel { margin-top: 16px; }
+.rewrite-panel .style-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.style-btn { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; cursor: pointer; background: white; transition: all 0.15s; }
+.style-btn:hover { border-color: #667eea; color: #667eea; }
+.style-btn.active { background: #667eea; color: white; border-color: #667eea; }
+.rewrite-output { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 10px; min-height: 100px; white-space: pre-wrap; font-size: 14px; line-height: 1.8; display: none; }
+.rewrite-output.show { display: block; }
+.loading { text-align: center; padding: 20px; color: #999; font-size: 13px; }
+.empty-state { text-align: center; padding: 60px 20px; color: #999; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid #eee; }
+.tab { padding: 10px 20px; cursor: pointer; font-size: 14px; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+@media (max-width: 768px) {
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🚀 海外搞钱资讯抓取 & 改写工具</h1>
+  <p>自动抓取海外AI/赚钱/跨境干货 · 一键多风格改写</p>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <div class="card">
+      <h3>⚙️ 设置</h3>
+      <div class="setting-row">
+        <label>Groq API Key（改写用，存在本地浏览器）</label>
+        <input type="password" id="groqKey" placeholder="gsk_xxxxxxxx">
+      </div>
+      <div class="setting-row">
+        <label>改写模型</label>
+        <select id="modelSelect">
+          <option value="auto">自动选择（推荐）</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveKey()">保存 Key</button>
+      <button class="btn btn-secondary btn-sm" onclick="refreshArticles()">刷新文章</button>
+    </div>
+
+    <div class="card">
+      <h3>📝 文章列表</h3>
+      <div class="article-list" id="articleList">
+        <div class="loading">加载中...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('original')">📄 原文</div>
+      <div class="tab" onclick="switchTab('rewrite')">✏️ 改写</div>
+    </div>
+
+    <div id="originalTab">
+      <div class="article-content" id="articleContent">
+        <div class="empty-state">
+          <div class="icon">📰</div>
+          <p>从左侧选择一篇文章阅读</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="rewriteTab" style="display:none;">
+      <div class="card rewrite-panel">
+        <h3>✏️ 一键改写</h3>
+        <div class="style-btns" id="styleBtns">
+          <div class="style-btn active" data-style="shortvideo">短视频口播文案</div>
+          <div class="style-btn" data-style="xiaohongshu">小红书笔记</div>
+          <div class="style-btn" data-style="gongzhonghao">公众号文章</div>
+          <div class="style-btn" data-style="zhihu">知乎回答</div>
+          <div class="style-btn" data-style="tweet">推特/微博</div>
+          <div class="style-btn" data-style="summary">超精简摘要</div>
+        </div>
+        <button class="btn btn-primary" id="rewriteBtn" onclick="doRewrite()" disabled>请先选择文章</button>
+        <button class="btn btn-secondary" onclick="copyRewrite()" style="margin-left:8px;">复制结果</button>
+        <div class="rewrite-output" id="rewriteOutput"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const REPO = 'mj65-cmd/overseas-news-fetcher';
+const BRANCH = 'main';
+let articles = [];
+let currentArticle = null;
+let currentStyle = 'shortvideo';
+
+// 改写风格提示词
+const STYLE_PROMPTS = {
+  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。要求：前5秒必须有钩子（悬念/痛点/反常识），口语化，像跟朋友聊天，只说最干的货，结尾留互动引导。不要出现价格、参数、下单链接。',
+  xiaohongshu: '把下面这篇文章改写成小红书笔记。要求：标题20字以内带emoji，正文分点用emoji标号，语言活泼接地气，多用"姐妹们""绝了""谁懂啊"这种词，结尾加3-5个话题标签。',
+  gongzhonghao: '把下面这篇文章改写成公众号文章。要求：标题有吸引力，开头场景化引入，正文分小标题，逻辑清晰有深度，结尾总结+行动号召，语言专业但不枯燥。',
+  zhihu: '把下面这篇文章改写成知乎回答风格。要求：开头"谢邀"或直接抛出观点，正文分点论证，有数据有案例，逻辑严谨，结尾总结，语言理性客观。',
+  tweet: '把下面这篇文章改写成3-5条推特/微博线程。要求：每条不超过140字，第一条抓眼球，中间逐条展开干货，最后一条总结+互动。用数字和emoji分隔。',
+  summary: '把下面这篇文章压缩成3句话的超精简摘要。要求：第一句说核心事件，第二句说关键数据/方法，第三句说对普通人的意义。不要多余修饰。'
+};
+
+// 初始化
+window.onload = function() {
+  const savedKey = localStorage.getItem('groq_key');
+  if (savedKey) document.getElementById('groqKey').value = savedKey;
+  loadModels();
+  refreshArticles();
+  
+  // 风格按钮
+  document.querySelectorAll('.style-btn').forEach(btn => {
+    btn.onclick = function() {
+      document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentStyle = this.dataset.style;
+    };
+  });
+};
+
+function saveKey() {
+  const key = document.getElementById('groqKey').value.trim();
+  localStorage.setItem('groq_key', key);
+  alert('Key 已保存到本地浏览器');
+  loadModels();
+}
+
+async function loadModels() {
+  const key = document.getElementById('groqKey').value.trim() || localStorage.getItem('groq_key');
+  if (!key) return;
+  try {
+    const resp = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: { 'Authorization': 'Bearer ' + key }
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const select = document.getElementById('modelSelect');
+      select.innerHTML = '<option value="auto">自动选择（推荐）</option>';
+      data.data.forEach(m => {
+        if (!m.id.includes('guard') && !m.id.includes('safeguard') && !m.id.includes('whisper')) {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.id;
+          select.appendChild(opt);
+        }
+      });
+    }
+  } catch(e) { console.log('load models error', e); }
+}
+
+async function refreshArticles() {
+  const listEl = document.getElementById('articleList');
+  listEl.innerHTML = '<div class="loading">加载文章列表...</div>';
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${REPO}/contents/output/articles?ref=${BRANCH}`);
+    const data = await resp.json();
+    articles = data.filter(f => f.name.endsWith('.md') && f.name !== 'processed.txt')
+      .sort((a,b) => new Date(b.last_modified) - new Date(a.last_modified));
+    
+    if (articles.length === 0) {
+      listEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:13px;">暂无文章</div>';
+      return;
+    }
+    
+    listEl.innerHTML = articles.map((a, i) => `
+      <div class="article-item" onclick="selectArticle(${i})" id="item-${i}">
+        <div class="title">${a.name.replace(/_/g,' ').replace('.md','')}</div>
+        <div class="meta">${(a.size/1024).toFixed(1)} KB</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:red;font-size:13px;">加载失败: ' + e.message + '</div>';
+  }
+}
+
+async function selectArticle(index) {
+  document.querySelectorAll('.article-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('item-' + index).classList.add('active');
+  
+  currentArticle = articles[index];
+  const contentEl = document.getElementById('articleContent');
+  contentEl.innerHTML = '<div class="loading">加载文章内容...</div>';
+  
+  try {
+    const resp = await fetch(articles[index].download_url);
+    const text = await resp.text();
+    contentEl.innerHTML = markdownToHtml(text);
+    document.getElementById('rewriteBtn').disabled = false;
+    document.getElementById('rewriteBtn').textContent = '开始改写';
+  } catch(e) {
+    contentEl.innerHTML = '<div class="empty-state">加载失败</div>';
+  }
+}
+
+function markdownToHtml(md) {
+  let html = md
+    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/^- (.*$)/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  
+  // 包裹列表
+  html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+  html = html.replace(/<\/ul><ul>/g, '');
+  
+  // 处理表格（简单处理）
+  if (html.includes('|')) {
+    const lines = md.split('\n');
+    let tableHtml = '';
+    let inTable = false;
+    let tableRows = [];
+    for (let line of lines) {
+      if (line.trim().startsWith('|') && line.includes('|')) {
+        inTable = true;
+        tableRows.push(line);
+      } else if (inTable) {
+        tableHtml += renderTable(tableRows);
+        tableRows = [];
+        inTable = false;
+      }
+    }
+    if (tableRows.length) tableHtml += renderTable(tableRows);
+    if (tableHtml) {
+      html = html.replace(/<p>[\s\S]*?<\/p>/g, function(match) {
+        if (match.includes('|')) return tableHtml;
+        return match;
+      });
+    }
+  }
+  
+  return '<p>' + html + '</p>';
+}
+
+function renderTable(rows) {
+  if (rows.length < 2) return '';
+  const headers = rows[0].split('|').filter(c => c.trim());
+  const body = rows.slice(2).map(r => r.split('|').filter(c => c.trim()));
+  let html = '<table><tr>';
+  headers.forEach(h => html += `<th>${h.trim()}</th>`);
+  html += '</tr>';
+  body.forEach(row => {
+    html += '<tr>';
+    row.forEach(c => html += `<td>${c.trim()}</td>`);
+    html += '</tr>';
+  });
+  html += '</table>';
+  return html;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (tab === 'original') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('originalTab').style.display = 'block';
+    document.getElementById('rewriteTab').style.display = 'none';
+  } else {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('originalTab').style.display = 'none';
+    document.getElementById('rewriteTab').style.display = 'block';
+  }
+}
+
+async function doRewrite() {
+  const key = document.getElementById('groqKey').value.trim() || localStorage.getItem('groq_key');
+  if (!key) { alert('请先在左侧填写并保存 Groq API Key'); return; }
+  if (!currentArticle) { alert('请先选择一篇文章'); return; }
+  
+  const btn = document.getElementById('rewriteBtn');
+  const output = document.getElementById('rewriteOutput');
+  btn.disabled = true;
+  btn.textContent = '改写中...';
+  output.classList.add('show');
+  output.textContent = '正在调用 AI 改写，请稍候...';
+  
+  try {
+    // 获取原文
+    const resp = await fetch(currentArticle.download_url);
+    const originalText = await resp.text();
+    
+    // 选择模型
+    let model = document.getElementById('modelSelect').value;
+    if (model === 'auto') {
+      const modelsResp = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      const modelsData = await modelsResp.json();
+      const available = modelsData.data.map(m => m.id);
+      const priority = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound', 'llama-3.3-70b-versatile'];
+      model = priority.find(m => available.includes(m)) || available.find(m => !m.includes('guard')) || 'mixtral-8x7b-32768';
+    }
+    
+    const systemPrompt = STYLE_PROMPTS[currentStyle];
+    
+    const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + key,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: model,
+        temperature: 0.7,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: '原文：\n' + originalText.substring(0, 20000) }
+        ]
+      })
+    });
+    
+    if (!groqResp.ok) {
+      const err = await groqResp.text();
+      output.textContent = '改写失败: ' + err.substring(0, 300);
+      return;
+    }
+    
+    const data = await groqResp.json();
+    output.textContent = data.choices[0].message.content;
+    
+  } catch(e) {
+    output.textContent = '改写出错: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '开始改写';
+  }
+}
+
+function copyRewrite() {
+  const text = document.getElementById('rewriteOutput').textContent;
+  if (!text || text.includes('正在调用') || text.includes('失败') || text.includes('出错')) {
+    alert('没有可复制的内容');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('已复制到剪贴板');
+  });
+}
+</script>
+</body>
+</html>
