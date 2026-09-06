@@ -138,12 +138,12 @@ let currentStyle = 'shortvideo';
 
 // 改写风格提示词
 const STYLE_PROMPTS = {
-  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。要求：前5秒必须有钩子（悬念/痛点/反常识），口语化，像跟朋友聊天，只说最干的货，结尾留互动引导。不要出现价格、参数、下单链接。',
-  xiaohongshu: '把下面这篇文章改写成小红书笔记。要求：标题20字以内带emoji，正文分点用emoji标号，语言活泼接地气，多用"姐妹们""绝了""谁懂啊"这种词，结尾加3-5个话题标签。',
-  gongzhonghao: '把下面这篇文章改写成公众号文章。要求：标题有吸引力，开头场景化引入，正文分小标题，逻辑清晰有深度，结尾总结+行动号召，语言专业但不枯燥。',
-  zhihu: '把下面这篇文章改写成知乎回答风格。要求：开头"谢邀"或直接抛出观点，正文分点论证，有数据有案例，逻辑严谨，结尾总结，语言理性客观。',
-  tweet: '把下面这篇文章改写成3-5条推特/微博线程。要求：每条不超过140字，第一条抓眼球，中间逐条展开干货，最后一条总结+互动。用数字和emoji分隔。',
-  summary: '把下面这篇文章压缩成3句话的超精简摘要。要求：第一句说核心事件，第二句说关键数据/方法，第三句说对普通人的意义。不要多余修饰。'
+  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。要求：1）标题必须有钩子，用悬念/反差/数字/痛点，比如"我没花一分钱，却靠这个工具月入5位数""你天天用的软件，藏着个赚钱功能没人知道"；2）前5秒必须抛出反常识或痛点；3）口语化，像跟朋友聊天，不要书面语；4）只说最干的货，不要废话；5）结尾留互动引导。输出纯文本，不要用任何markdown符号、星号、井号、特殊符号，直接写正文。',
+  xiaohongshu: '把下面这篇文章改写成小红书笔记。要求：1）标题20字以内，必须有钩子+emoji，用数字/反差/痛点，比如"3个AI工具，让我每天多赚200块😭""别再瞎忙了！这个方法才是真赚钱"；2）正文分点用emoji标号，语言活泼接地气；3）多用"姐妹们""绝了""谁懂啊"这种词；4）结尾加3-5个话题标签。输出纯文本，不要用任何markdown符号、星号、井号，直接写正文。',
+  gongzhonghao: '把下面这篇文章改写成公众号文章。要求：1）标题必须有吸引力，用悬念/数字/反差，比如"那个靠AI月入10万的普通人，做对了什么？"；2）开头场景化引入，制造痛点或好奇；3）正文分小标题，逻辑清晰有深度；4）结尾总结+行动号召；5）语言专业但不枯燥。输出纯文本，不要用任何markdown符号、星号、井号，直接写正文，段落用空行分隔。',
+  zhihu: '把下面这篇文章改写成知乎回答风格。要求：1）开头直接抛出观点或"谢邀"；2）正文分点论证，有数据有案例；3）逻辑严谨，语言理性客观；4）结尾总结。输出纯文本，不要用任何markdown符号、星号、井号，直接写正文。',
+  tweet: '把下面这篇文章改写成3-5条推特/微博线程。要求：1）第一条抓眼球，用悬念或数字；2）中间逐条展开干货；3）最后一条总结+互动；4）每条不超过140字；5）用数字和emoji分隔。输出纯文本，不要用任何markdown符号、星号、井号。',
+  summary: '把下面这篇文章压缩成3句话的超精简摘要。要求：1）第一句说核心事件；2）第二句说关键数据/方法；3）第三句说对普通人的意义。输出纯文本，不要用任何markdown符号、星号、井号。'
 };
 
 // 初始化
@@ -311,6 +311,17 @@ function switchTab(tab) {
   }
 }
 
+
+function cleanText(text) {
+  return text
+    .replace(/[\u200B-\u200F\u2028-\u202F\uFEFF]/g, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    .replace(/[*_`#>~]/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]+$/gm, '')
+    .trim();
+}
+
 async function doRewrite() {
   const key = document.getElementById('groqKey').value.trim() || localStorage.getItem('groq_key');
   if (!key) { alert('请先在左侧填写并保存 Groq API Key'); return; }
@@ -365,7 +376,7 @@ async function doRewrite() {
     }
     
     const data = await groqResp.json();
-    output.textContent = data.choices[0].message.content;
+    output.textContent = cleanText(data.choices[0].message.content);
     
   } catch(e) {
     output.textContent = '改写出错: ' + e.message;
@@ -376,7 +387,7 @@ async function doRewrite() {
 }
 
 function copyRewrite() {
-  const text = document.getElementById('rewriteOutput').textContent;
+  const text = cleanText(document.getElementById('rewriteOutput').textContent);
   if (!text || text.includes('正在调用') || text.includes('失败') || text.includes('出错')) {
     alert('没有可复制的内容');
     return;
