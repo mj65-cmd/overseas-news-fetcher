@@ -9,16 +9,49 @@ OUTPUT_FOLDER = BASE / "output" / "articles"
 OUTPUT_FOLDER.mkdir(exist_ok=True, parents=True)
 PROCESSED_FILE = OUTPUT_FOLDER / "processed.txt"
 
-# ========== 每天抓取数量控制 ==========
 MAX_ARTICLES = 5
-# ======================================
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 JINA_KEY = os.environ.get("JINA_API_KEY", "")
 
 if not GROQ_KEY:
-    print("FATAL: GROQ_API_KEY is empty. Please set it in repository Secrets.")
+    print("FATAL: GROQ_API_KEY is empty.")
     sys.exit(1)
+
+# 自动检测可用模型
+GROQ_MODELS = [
+    "llama-3.1-70b-versatile",
+    "llama-3.3-70b-versatile",
+    "mixtral-8x7b-32768",
+    "llama-3.1-8b-instant",
+    "gemma2-9b-it",
+]
+ACTIVE_MODEL = None
+
+def detect_model():
+    global ACTIVE_MODEL
+    try:
+        resp = requests.get(
+            "https://api.groq.com/openai/v1/models",
+            headers={"Authorization": f"Bearer {GROQ_KEY}"},
+            timeout=30
+        )
+        if resp.status_code == 200:
+            available = {m["id"] for m in resp.json().get("data", [])}
+            print(f"Groq available models: {sorted(available)[:10]}...")
+            for m in GROQ_MODELS:
+                if m in available:
+                    ACTIVE_MODEL = m
+                    print(f"Using model: {ACTIVE_MODEL}")
+                    return
+        else:
+            print(f"Model list query failed: {resp.status_code} {resp.text[:200]}")
+    except Exception as e:
+        print(f"Model detection error: {e}")
+    ACTIVE_MODEL = GROQ_MODELS[0]
+    print(f"Fallback to model: {ACTIVE_MODEL}")
+
+detect_model()
 
 with open(SOURCES_PATH, "r", encoding="utf-8") as f:
     sources = json.load(f)
@@ -36,21 +69,21 @@ def llm_extract(full_text):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
     payload = {
-        "model": "llama-3.3-70b-versatile",
+        "model": ACTIVE_MODEL,
         "temperature": 0.3,
         "messages": [
             {"role": "system", "content": extract_prompt},
-            {"role": "user", "content": f"原文:\n{full_text[:30000]}"}
+            {"role": "user", "content": f"原文:\n{full_text[:25000]}"}
         ]
     }
     try:
         resp = requests.post(url, json=payload, headers=headers, timeout=180)
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            print(f"    Groq HTTP {resp.status_code}: {resp.text[:300]}")
+            return None
         return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
         print(f"    Groq API error: {e}")
-        if hasattr(resp := None, 'text') and resp:
-            print(f"    Response: {resp.text[:500]}")
         return None
 
 def get_full_article(url):
@@ -59,8 +92,10 @@ def get_full_article(url):
     if JINA_KEY:
         headers["Authorization"] = f"Bearer {JINA_KEY}"
     try:
-        res = requests.get(jina_url, headers=headers, timeout=120)
-        res.raise_for_status()
+        res = requests.get(jina_url, headers=headers, timeout=60)
+        if res.status_code != 200:
+            print(f"    Jina HTTP {res.status_code}")
+            return None
         return res.text
     except Exception as e:
         print(f"    Jina fetch error: {e}")
@@ -70,7 +105,6 @@ def is_blacklisted(text):
     low = text.lower()
     return any(bad_word in low for bad_word in blacklist)
 
-# 主程序
 print("=" * 50)
 print(f"开始抓取新闻，目标数量：{MAX_ARTICLES} 条")
 print("=" * 50)
@@ -87,10 +121,14 @@ for category, rss_list in sources.items():
         print(f"\n正在抓取 [{category}]：{feed_url}")
         try:
             feed = feedparser.parse(feed_url)
-            if not feed.entries:
-                print(f"  警告：该RSS源没有返回任何条目")
+            entries = feed.entries
+            if not entries:
+                print(f"  警告：该RSS源没有返回任何条目 (bozo={feed.bozo})")
+                if feed.bozo_exception:
+                    print(f"    原因: {feed.bozo_exception}")
                 continue
-            for entry in feed.entries[:10]:
+            print(f"  获取到 {len(entries)} 条条目")
+            for entry in entries[:10]:
                 if article_count >= MAX_ARTICLES:
                     break
                 link = entry.get("link", "")
@@ -108,6 +146,7 @@ for category, rss_list in sources.items():
                         print(f"    跳过：正文为空或过短")
                         processed.add(link)
                         continue
+                    print(f"    正文长度: {len(full_text)} 字符")
                     extracted_content = llm_extract(full_text)
                     if not extracted_content:
                         print(f"    跳过：AI萃取失败")
@@ -131,7 +170,6 @@ for category, rss_list in sources.items():
             print(f"  ❌ RSS源读取失败：{e}")
             continue
 
-# 保存稿件
 for idx, (title, md, link) in enumerate(all_results):
     safe_name = re.sub(r'[^\w]','_',title)[:60] + ".md"
     out_file = OUTPUT_FOLDER / safe_name
