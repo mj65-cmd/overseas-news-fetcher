@@ -1,21 +1,23 @@
 {
-  "AI赚钱玩法": [
+  "AI工具实操": [
+    "https://www.futuretools.io/rss",
+    "https://theresanaiforthat.com/rss/",
+    "https://venturebeat.com/category/ai/feed/"
+  ],
+  "普通人搞钱": [
     "https://www.sidehustlenation.com/feed/",
     "https://www.smartpassiveincome.com/feed/",
     "https://neilpatel.com/blog/feed/",
-    "https://www.matthewwoodward.co.uk/feed/"
+    "https://www.matthewwoodward.co.uk/feed/",
+    "https://problogger.com/feed/"
   ],
-  "AI工具实操": [
-    "https://techcrunch.com/category/artificial-intelligence/feed/",
-    "https://venturebeat.com/category/ai/feed/",
-    "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+  "内容创作/自媒体": [
+    "https://www.vidiq.com/blog/feed/",
+    "https://blog.youtube/feed/",
+    "https://www.tubefilter.com/feed/"
   ],
-  "跨境/独立站": [
+  "出海/跨境赚钱": [
     "https://www.ecommercebytes.com/feed/",
     "https://www.shopify.com/blog/feed.xml"
-  ],
-  "YouTube/内容创作": [
-    "https://blog.youtube/feed/",
-    "https://creatorhub.youtube/feed/"
   ]
 }
