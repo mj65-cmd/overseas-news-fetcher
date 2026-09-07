@@ -400,48 +400,69 @@ async function doRewrite() {
   output.textContent = '正在调用 AI 改写，请稍候...';
   
   try {
-    // 获取原文
     const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(currentArticle.name)}?t=${Date.now()}`);
     const originalText = await resp.text();
     
-    // 选择模型
-    let model = document.getElementById('modelSelect').value;
-    if (model === 'auto') {
-      const modelsResp = await fetch('https://api.groq.com/openai/v1/models', {
-        headers: { 'Authorization': 'Bearer ' + key }
-      });
-      const modelsData = await modelsResp.json();
-      const available = modelsData.data.map(m => m.id);
-      const priority = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'groq/compound', 'llama-3.3-70b-versatile'];
-      model = priority.find(m => available.includes(m)) || available.find(m => !m.includes('guard')) || 'mixtral-8x7b-32768';
+    // 获取可用模型列表，按优先级排序
+    const modelsResp = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: { 'Authorization': 'Bearer ' + key }
+    });
+    const modelsData = await modelsResp.json();
+    const available = modelsData.data.map(m => m.id);
+    const priority = ['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'groq/compound', 'groq/compound-mini', 'canopylabs/orpheus-v1-english'];
+    const modelList = priority.filter(m => available.includes(m));
+    if (modelList.length === 0) {
+      modelList.push(available.find(m => !m.includes('guard') && !m.includes('whisper')) || 'mixtral-8x7b-32768');
     }
     
     const systemPrompt = STYLE_PROMPTS[currentStyle];
+    let lastError = '';
     
-    const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + key,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model,
-        temperature: 0.7,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: '原文：\n' + originalText.substring(0, 20000) }
-        ]
-      })
-    });
-    
-    if (!groqResp.ok) {
-      const err = await groqResp.text();
-      output.textContent = '改写失败: ' + err.substring(0, 300);
-      return;
+    // 逐个模型尝试，遇到限流自动切换
+    for (let i = 0; i < modelList.length; i++) {
+      const model = modelList[i];
+      output.textContent = `正在用 ${model} 改写... (${i+1}/${modelList.length})`;
+      
+      try {
+        const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + key,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: model,
+            temperature: 0.7,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: '原文：\n' + originalText.substring(0, 15000) }
+            ]
+          })
+        });
+        
+        if (groqResp.status === 429) {
+          lastError = '模型 ' + model + ' 限流，自动切换下一个...';
+          output.textContent = lastError;
+          await new Promise(r => setTimeout(r, 2000));
+          continue;
+        }
+        
+        if (!groqResp.ok) {
+          const err = await groqResp.text();
+          lastError = '改写失败 (' + model + '): ' + err.substring(0, 200);
+          continue;
+        }
+        
+        const data = await groqResp.json();
+        output.textContent = cleanText(data.choices[0].message.content);
+        return;
+      } catch(e) {
+        lastError = '模型 ' + model + ' 出错: ' + e.message;
+        continue;
+      }
     }
     
-    const data = await groqResp.json();
-    output.textContent = cleanText(data.choices[0].message.content);
+    output.textContent = '所有模型都暂时不可用，请稍后再试。最后错误: ' + lastError;
     
   } catch(e) {
     output.textContent = '改写出错: ' + e.message;
