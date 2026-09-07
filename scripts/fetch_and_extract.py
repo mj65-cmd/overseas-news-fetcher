@@ -228,6 +228,28 @@ with open(PROCESSED_FILE, "a", encoding="utf-8") as f:
     for _,_,link in all_results:
         f.write(link + "\n")
 
+# 生成索引文件（包含准确时间）
+index = []
+for f in OUTPUT_FOLDER.glob("*.md"):
+    if f.name == "processed.txt":
+        continue
+    try:
+        with open(f, "r", encoding="utf-8") as fh:
+            first_line = fh.readline().strip().lstrip("# ").strip()
+        index.append({
+            "name": f.name,
+            "title": first_line if first_line else f.name.replace(".md","").replace("_"," "),
+            "size": f.stat().st_size,
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(f.stat().st_mtime))
+        })
+    except:
+        pass
+
+index.sort(key=lambda x: x["created_at"], reverse=True)
+with open(OUTPUT_FOLDER / "index.json", "w", encoding="utf-8") as f:
+    json.dump(index, f, ensure_ascii=False, indent=2)
+print(f"索引文件已生成，共 {len(index)} 篇")
+
 print(f"\n{'=' * 50}")
 print(f"全部完成！成功生成 {article_count} 篇新闻稿件。")
 print(f"{'=' * 50}")
