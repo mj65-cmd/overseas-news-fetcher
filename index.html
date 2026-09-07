@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>海外搞钱资讯 - 抓取 & 改写工具</title>
+<title>海外搞钱内参 - 每天自动抓取赚钱干货</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; }
@@ -65,8 +65,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 <body>
 
 <div class="header">
-  <h1>🚀 海外搞钱资讯抓取 & 改写工具</h1>
-  <p>自动抓取海外AI/赚钱/跨境干货 · 一键多风格改写</p>
+  <h1>📰 海外搞钱内参</h1>
+  <p>每天自动抓取海外AI/赚钱/跨境干货 · 一键改写成多平台文案</p>
 </div>
 
 <div class="container">
@@ -84,7 +84,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
         </select>
       </div>
       <button class="btn btn-primary btn-sm" onclick="saveKey()">保存 Key</button>
-      <button class="btn btn-secondary btn-sm" onclick="refreshArticles()">刷新文章</button>
+      <button class="btn btn-secondary btn-sm" id="refreshBtn" onclick="refreshArticles()">🔄 刷新文章</button>
     </div>
 
     <div class="card">
@@ -195,7 +195,11 @@ async function loadModels() {
 
 async function refreshArticles() {
   const listEl = document.getElementById('articleList');
-  listEl.innerHTML = '<div class="loading">加载文章列表...</div>';
+  const btn = document.getElementById('refreshBtn');
+  const oldCount = articles.length;
+  btn.disabled = true;
+  btn.textContent = '⏳ 刷新中...';
+  listEl.innerHTML = '<div class="loading">正在加载最新文章...</div>';
   try {
     const resp = await fetch(`https://api.github.com/repos/${REPO}/contents/output/articles?ref=${BRANCH}`);
     const data = await resp.json();
@@ -204,6 +208,8 @@ async function refreshArticles() {
     
     if (articles.length === 0) {
       listEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:13px;">暂无文章</div>';
+      btn.textContent = '🔄 刷新文章';
+      btn.disabled = false;
       return;
     }
     
@@ -213,8 +219,20 @@ async function refreshArticles() {
         <div class="meta">${(a.size/1024).toFixed(1)} KB</div>
       </div>
     `).join('');
+    
+    const newCount = articles.length - oldCount;
+    if (newCount > 0) {
+      btn.textContent = `✅ 已更新 (+${newCount}篇)`;
+    } else if (oldCount > 0) {
+      btn.textContent = `✅ 已是最新 (${articles.length}篇)`;
+    } else {
+      btn.textContent = `✅ 加载完成 (${articles.length}篇)`;
+    }
+    setTimeout(() => { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }, 2500);
   } catch(e) {
     listEl.innerHTML = '<div style="padding:20px;text-align:center;color:red;font-size:13px;">加载失败: ' + e.message + '</div>';
+    btn.textContent = '❌ 刷新失败';
+    setTimeout(() => { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }, 2000);
   }
 }
 
