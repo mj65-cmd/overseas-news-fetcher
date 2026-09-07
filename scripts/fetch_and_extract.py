@@ -9,7 +9,7 @@ OUTPUT_FOLDER = BASE / "output" / "articles"
 OUTPUT_FOLDER.mkdir(exist_ok=True, parents=True)
 PROCESSED_FILE = OUTPUT_FOLDER / "processed.txt"
 
-MAX_ARTICLES = 5
+MAX_ARTICLES = 10
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 JINA_KEY = os.environ.get("JINA_API_KEY", "")
