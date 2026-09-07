@@ -226,10 +226,21 @@ async function refreshArticles() {
   btn.textContent = '⏳ 刷新中...';
   listEl.innerHTML = '<div class="loading">正在加载最新文章...</div>';
   try {
-    const resp = await fetch(`https://api.github.com/repos/${REPO}/contents/output/articles?ref=${BRANCH}`);
-    const data = await resp.json();
-    articles = data.filter(f => f.name.endsWith('.md') && f.name !== 'processed.txt')
-      .sort((a,b) => new Date(b.last_modified) - new Date(a.last_modified));
+    // 优先读索引文件（有准确时间）
+    let indexResp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/index.json?t=${Date.now()}`);
+    if (indexResp.ok) {
+      articles = await indexResp.json();
+    } else {
+      //  fallback: 读目录列表
+      const resp = await fetch(`https://api.github.com/repos/${REPO}/contents/output/articles?ref=${BRANCH}`);
+      const data = await resp.json();
+      articles = data.filter(f => f.name.endsWith('.md') && f.name !== 'processed.txt').map(f => ({
+        name: f.name,
+        title: f.name.replace(/_/g,' ').replace('.md',''),
+        size: f.size,
+        created_at: new Date().toISOString()
+      }));
+    }
     
     if (articles.length === 0) {
       listEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:13px;">暂无文章</div>';
@@ -240,13 +251,14 @@ async function refreshArticles() {
     
     const now = Date.now();
     listEl.innerHTML = articles.map((a, i) => {
-      const articleTime = (a.last_modified && !isNaN(new Date(a.last_modified).getTime())) ? new Date(a.last_modified).getTime() : Date.now();
+      const articleTime = new Date(a.created_at).getTime();
       const isNew = (now - articleTime) < 24 * 3600 * 1000;
-      const dateStr = formatChineseTime(a.last_modified || a.updated_at || a.created_at);
+      const dateStr = formatChineseTime(a.created_at);
       const newBadge = isNew ? ' <span style="color:#667eea;font-weight:600;">NEW</span>' : '';
+      const displayTitle = a.title || a.name.replace(/_/g,' ').replace('.md','');
       return `
       <div class="article-item ${isNew ? 'new' : ''}" onclick="selectArticle(${i})" id="item-${i}">
-        <div class="title">${a.name.replace(/_/g,' ').replace('.md','')}${newBadge}</div>
+        <div class="title">${displayTitle.substring(0,60)}${displayTitle.length>60?'...':''}${newBadge}</div>
         <div class="meta">${(a.size/1024).toFixed(1)} KB</div>
         <div class="date">${dateStr}</div>
       </div>`;
@@ -277,7 +289,8 @@ async function selectArticle(index) {
   contentEl.innerHTML = '<div class="loading">加载文章内容...</div>';
   
   try {
-    const resp = await fetch(articles[index].download_url);
+    const url = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(articles[index].name)}?t=${Date.now()}`;
+    const resp = await fetch(url);
     const text = await resp.text();
     contentEl.innerHTML = markdownToHtml(text);
     document.getElementById('rewriteBtn').disabled = false;
@@ -388,7 +401,7 @@ async function doRewrite() {
   
   try {
     // 获取原文
-    const resp = await fetch(currentArticle.download_url);
+    const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(currentArticle.name)}?t=${Date.now()}`);
     const originalText = await resp.text();
     
     // 选择模型
