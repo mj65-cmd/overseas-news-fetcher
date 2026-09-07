@@ -409,10 +409,10 @@ async function doRewrite() {
     });
     const modelsData = await modelsResp.json();
     const available = modelsData.data.map(m => m.id);
-    const priority = ['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'groq/compound', 'groq/compound-mini', 'canopylabs/orpheus-v1-english'];
+    const priority = ['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'groq/compound', 'groq/compound-mini', 'allam-2-7b'];
     const modelList = priority.filter(m => available.includes(m));
     if (modelList.length === 0) {
-      modelList.push(available.find(m => !m.includes('guard') && !m.includes('whisper')) || 'mixtral-8x7b-32768');
+      modelList.push(available.find(m => !m.includes('guard') && !m.includes('whisper') && !m.includes('canopylabs') && !m.includes('orpheus')) || 'mixtral-8x7b-32768');
     }
     
     const systemPrompt = STYLE_PROMPTS[currentStyle];
