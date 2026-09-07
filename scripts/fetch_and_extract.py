@@ -153,6 +153,7 @@ print("=" * 50)
 
 all_results = []
 article_count = 0
+article_meta = []  # 记录每篇文章的真实生成时间和中文标题
 
 for category, rss_list in sources.items():
     if article_count >= MAX_ARTICLES:
@@ -201,6 +202,18 @@ for category, rss_list in sources.items():
                     all_results.append((title, article_markdown, link))
                     if "【跳过】" not in article_markdown:
                         article_count += 1
+                        # 提取中文标题（文章里的第二个# 行）
+                        chinese_title = title
+                        for line in article_markdown.split('\n'):
+                            if line.startswith('# ') and line != f'# {title}':
+                                chinese_title = line.lstrip('# ').strip()
+                                break
+                        article_meta.append({
+                            "orig_title": title,
+                            "chinese_title": chinese_title,
+                            "link": link,
+                            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime())
+                        })
                         print(f"  ✅ 完成第 {article_count}/{MAX_ARTICLES} 条")
                     else:
                         print(f"  ⏭️  跳过（无实操价值）")
@@ -228,19 +241,40 @@ with open(PROCESSED_FILE, "a", encoding="utf-8") as f:
     for _,_,link in all_results:
         f.write(link + "\n")
 
-# 生成索引文件（包含准确时间）
+# 生成索引文件（包含中文标题和真实生成时间）
 index = []
+for meta in article_meta:
+    safe_name = re.sub(r'[^\w]','_',meta["orig_title"])[:60] + ".md"
+    f_path = OUTPUT_FOLDER / safe_name
+    if f_path.exists():
+        index.append({
+            "name": safe_name,
+            "title": meta["chinese_title"],
+            "size": f_path.stat().st_size,
+            "created_at": meta["generated_at"]
+        })
+
+# 加上之前已有的文章（从文件mtime读取）
+existing_names = {item["name"] for item in index}
 for f in OUTPUT_FOLDER.glob("*.md"):
-    if f.name == "processed.txt":
+    if f.name == "processed.txt" or f.name in existing_names:
         continue
     try:
         with open(f, "r", encoding="utf-8") as fh:
-            first_line = fh.readline().strip().lstrip("# ").strip()
+            lines = fh.readlines()
+            chinese_title = ""
+            for line in lines[:5]:
+                if line.startswith('# ') and not line.startswith('# http'):
+                    chinese_title = line.lstrip('# ').strip()
+                    if chinese_title and not chinese_title.startswith('http'):
+                        break
+        if not chinese_title:
+            chinese_title = f.name.replace(".md","").replace("_"," ")
         index.append({
             "name": f.name,
-            "title": first_line if first_line else f.name.replace(".md","").replace("_"," "),
+            "title": chinese_title,
             "size": f.stat().st_size,
-            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(f.stat().st_mtime))
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime(f.stat().st_mtime))
         })
     except:
         pass
