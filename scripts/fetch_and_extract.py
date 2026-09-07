@@ -1,4 +1,4 @@
-import feedparser, requests, json, os, re, time, sys
+import feedparser, requests, json, os, re, time, sys, datetime
 from pathlib import Path
 
 BASE = Path(__file__).parent.parent
@@ -129,6 +129,23 @@ def get_full_article(url):
 def is_blacklisted(text):
     low = text.lower()
     return any(bad_word in low for bad_word in blacklist)
+
+
+def cleanup_old_articles():
+    """删除3天前的旧文章"""
+    cutoff = time.time() - 3 * 24 * 3600
+    deleted = 0
+    for f in OUTPUT_FOLDER.glob("*.md"):
+        if f.name == "processed.txt":
+            continue
+        if f.stat().st_mtime < cutoff:
+            f.unlink()
+            deleted += 1
+            print(f"  🗑️  删除旧文章: {f.name}")
+    if deleted > 0:
+        print(f"  共删除 {deleted} 篇3天前的旧文章")
+
+cleanup_old_articles()
 
 print("=" * 50)
 print(f"开始抓取新闻，目标数量：{MAX_ARTICLES} 条")
