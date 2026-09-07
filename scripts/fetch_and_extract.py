@@ -82,23 +82,34 @@ if PROCESSED_FILE.exists():
 def llm_extract(full_text):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
-    payload = {
-        "model": ACTIVE_MODEL,
-        "temperature": 0.3,
-        "messages": [
-            {"role": "system", "content": extract_prompt},
-            {"role": "user", "content": f"原文:\n{full_text[:25000]}"}
-        ]
-    }
-    try:
-        resp = requests.post(url, json=payload, headers=headers, timeout=180)
-        if resp.status_code != 200:
-            print(f"    Groq HTTP {resp.status_code}: {resp.text[:400]}")
+    max_retries = 3
+    for attempt in range(max_retries):
+        payload = {
+            "model": ACTIVE_MODEL,
+            "temperature": 0.3,
+            "messages": [
+                {"role": "system", "content": extract_prompt},
+                {"role": "user", "content": f"原文:\n{full_text[:15000]}"}
+            ]
+        }
+        try:
+            resp = requests.post(url, json=payload, headers=headers, timeout=180)
+            if resp.status_code == 429:
+                wait_time = 20 + attempt * 10
+                print(f"    Groq 限流，等待 {wait_time}秒后重试 ({attempt+1}/{max_retries})")
+                time.sleep(wait_time)
+                continue
+            if resp.status_code != 200:
+                print(f"    Groq HTTP {resp.status_code}: {resp.text[:300]}")
+                return None
+            return resp.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            print(f"    Groq API error: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(5)
+                continue
             return None
-        return resp.json()["choices"][0]["message"]["content"]
-    except Exception as e:
-        print(f"    Groq API error: {e}")
-        return None
+    return None
 
 def get_full_article(url):
     jina_url = f"https://r.jina.ai/{url}"
@@ -176,7 +187,7 @@ for category, rss_list in sources.items():
                         print(f"  ✅ 完成第 {article_count}/{MAX_ARTICLES} 条")
                     else:
                         print(f"  ⏭️  跳过（无实操价值）")
-                    time.sleep(2)
+                    time.sleep(5)
                 except Exception as e:
                     print(f"  ❌ 处理失败：{e}")
                     processed.add(link)
