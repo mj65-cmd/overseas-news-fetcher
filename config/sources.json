@@ -1,22 +1,23 @@
 {
-  "副业赚钱案例": [
-    "https://www.sidehustlenation.com/feed/",
-    "https://www.smartpassiveincome.com/feed/",
-    "https://www.nichepursuits.com/feed/",
-    "https://problogger.com/feed/",
-    "https://www.matthewwoodward.co.uk/feed/",
-    "https://www.dollarsprout.com/feed/"
+  "免费工具/开源软件": [
+    "https://itsfoss.com/feed/",
+    "https://www.omgubuntu.co.uk/feed",
+    "https://www.makeuseof.com/feed/",
+    "https://www.howtogeek.com/feed/"
   ],
-  "AI工具实操": [
+  "AI工具实操/白嫖": [
     "https://venturebeat.com/category/ai/feed/",
-    "https://techcrunch.com/category/artificial-intelligence/feed/"
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "https://www.therundown.ai/feed"
+  ],
+  "线上副业/自动化": [
+    "https://www.sidehustlenation.com/feed/",
+    "https://www.nichepursuits.com/feed/",
+    "https://www.matthewwoodward.co.uk/feed/",
+    "https://problogger.com/feed/"
   ],
   "内容创作/自媒体": [
     "https://blog.youtube/feed/",
     "https://www.tubefilter.com/feed/"
-  ],
-  "跨境/独立站": [
-    "https://www.ecommercebytes.com/feed/",
-    "https://www.shopify.com/blog/feed.xml"
   ]
 }
