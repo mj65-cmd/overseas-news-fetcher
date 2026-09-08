@@ -1,8 +1,15 @@
 name: News-Crawl-Job
 on:
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
+    inputs:
+      source_type:
+        description: '抓取类型: gzh(公众号实操干货) / tt(今日头条热点资讯)'
+        required: true
+        default: 'gzh'
+        type: choice
+        options:
+          - gzh
+          - tt
 
 permissions:
   contents: write
@@ -21,6 +28,7 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           JINA_API_KEY: ${{ secrets.JINA_API_KEY }}
+          SOURCE_TYPE: ${{ github.event.inputs.source_type }}
         run: python scripts/fetch_and_extract.py
       - name: Save
         run: |
