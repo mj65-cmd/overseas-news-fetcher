@@ -3,62 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>海外搞钱内参 - 每天自动抓取赚钱干货</title>
+<title>海外搞钱内参 - 公众号 & 今日头条双平台工具</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f7; color: #1d1d1f; }
-.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
-.header h1 { font-size: 22px; margin-bottom: 6px; }
-.header p { font-size: 13px; opacity: 0.9; }
-.container { max-width: 1200px; margin: 0 auto; padding: 16px; display: flex; gap: 16px; }
-.sidebar { width: 320px; flex-shrink: 0; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 18px; text-align: center; }
+.header h1 { font-size: 20px; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.9; }
+.container { max-width: 1300px; margin: 0 auto; padding: 14px; display: flex; gap: 14px; }
+.sidebar { width: 310px; flex-shrink: 0; }
 .main { flex: 1; min-width: 0; }
-.card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.card h3 { font-size: 15px; margin-bottom: 10px; color: #333; }
-.setting-row { margin-bottom: 10px; }
-.setting-row label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
-.setting-row input, .setting-row select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+.card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card h3 { font-size: 14px; margin-bottom: 10px; color: #333; display: flex; align-items: center; gap: 6px; }
+.setting-row { margin-bottom: 8px; }
+.setting-row label { display: block; font-size: 11px; color: #666; margin-bottom: 3px; }
+.setting-row input, .setting-row select { width: 100%; padding: 7px 9px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; }
 .setting-row input:focus, .setting-row select:focus { outline: none; border-color: #667eea; }
-.btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
 .btn-primary { background: #667eea; color: white; }
 .btn-primary:hover { background: #5568d3; }
 .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+.btn-gzh { background: #07c160; color: white; }
+.btn-gzh:hover { background: #06ad56; }
+.btn-tt { background: #ff4757; color: white; }
+.btn-tt:hover { background: #e8404f; }
 .btn-secondary { background: #f0f0f0; color: #333; }
 .btn-secondary:hover { background: #e0e0e0; }
-.btn-sm { padding: 5px 10px; font-size: 12px; }
-.article-list { max-height: calc(100vh - 300px); overflow-y: auto; }
-.article-item { padding: 10px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: background 0.15s; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.fetch-btns { display: flex; gap: 6px; margin-bottom: 8px; }
+.fetch-btns .btn { flex: 1; }
+.article-list { max-height: calc(100vh - 380px); overflow-y: auto; }
+.article-item { padding: 9px; border-radius: 8px; cursor: pointer; margin-bottom: 3px; transition: background 0.15s; border-left: 3px solid transparent; }
 .article-item:hover { background: #f5f5f7; }
-.article-item.active { background: #eef0ff; }
-.article-item.new { border-left: 3px solid #667eea; padding-left: 7px; }
-.article-item .date { font-size: 11px; color: #999; margin-top: 2px; }
-.article-item.new .date { color: #667eea; font-weight: 600; }
-.article-item .title { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 3px; }
-.article-item .meta { font-size: 11px; color: #999; }
-.article-content { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); min-height: 400px; }
-.article-content h1 { font-size: 22px; margin-bottom: 8px; line-height: 1.4; }
-.article-content .article-meta { font-size: 12px; color: #888; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
-.article-content .article-meta a { color: #667eea; text-decoration: none; }
-.article-content h2 { font-size: 17px; margin: 18px 0 8px; color: #333; }
-.article-content p { font-size: 14px; line-height: 1.8; margin-bottom: 10px; color: #444; }
-.article-content ul, .article-content ol { margin: 8px 0 12px 20px; }
-.article-content li { font-size: 14px; line-height: 1.8; margin-bottom: 4px; color: #444; }
-.article-content table { border-collapse: collapse; width: 100%; margin: 10px 0; }
-.article-content th, .article-content td { border: 1px solid #ddd; padding: 8px; font-size: 13px; text-align: left; }
-.article-content th { background: #f5f5f7; }
-.rewrite-panel { margin-top: 16px; }
-.rewrite-panel .style-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.style-btn { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; cursor: pointer; background: white; transition: all 0.15s; }
+.article-item.active { background: #eef0ff; border-left-color: #667eea; }
+.article-item .title { font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 3px; }
+.article-item .meta { font-size: 10px; color: #999; display: flex; justify-content: space-between; align-items: center; }
+.tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+.tag-gzh { background: #e8f8ef; color: #07c160; }
+.tag-tt { background: #ffeef0; color: #ff4757; }
+.tag-unknown { background: #f0f0f0; color: #999; }
+.article-content { background: white; border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); min-height: 300px; }
+.article-content h1 { font-size: 20px; margin-bottom: 8px; line-height: 1.4; }
+.article-content .article-meta { font-size: 11px; color: #888; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+.article-content h2 { font-size: 16px; margin: 16px 0 7px; color: #333; }
+.article-content p { font-size: 14px; line-height: 1.8; margin-bottom: 8px; color: #444; }
+.article-content ul, .article-content ol { margin: 6px 0 10px 20px; }
+.article-content li { font-size: 14px; line-height: 1.8; margin-bottom: 3px; color: #444; }
+.tabs { display: flex; gap: 0; margin-bottom: 14px; border-bottom: 2px solid #eee; }
+.tab { padding: 9px 18px; cursor: pointer; font-size: 13px; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+.style-btns { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.style-btn { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 11px; cursor: pointer; background: white; transition: all 0.15s; }
 .style-btn:hover { border-color: #667eea; color: #667eea; }
 .style-btn.active { background: #667eea; color: white; border-color: #667eea; }
-.rewrite-output { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-top: 10px; min-height: 100px; white-space: pre-wrap; word-break: break-word; font-size: 15px; line-height: 2; display: none; }
+.rewrite-output { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 16px; margin-top: 10px; min-height: 80px; white-space: pre-wrap; font-size: 14px; line-height: 1.9; display: none; }
 .rewrite-output.show { display: block; }
-.loading { text-align: center; padding: 20px; color: #999; font-size: 13px; }
-.empty-state { text-align: center; padding: 60px 20px; color: #999; }
-.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-.tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid #eee; }
-.tab { padding: 10px 20px; cursor: pointer; font-size: 14px; color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-.tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+.cover-section { margin-top: 14px; }
+.cover-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.cover-btn { padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 11px; cursor: pointer; background: white; }
+.cover-btn:hover { border-color: #667eea; color: #667eea; }
+.cover-btn.active { background: #667eea; color: white; border-color: #667eea; }
+.cover-prompt { background: #f0f7ff; border: 1px solid #d0e3ff; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 12px; line-height: 1.7; display: none; white-space: pre-wrap; }
+.cover-prompt.show { display: block; }
+.loading { text-align: center; padding: 16px; color: #999; font-size: 13px; }
+.empty-state { text-align: center; padding: 50px 20px; color: #999; }
+.empty-state .icon { font-size: 42px; margin-bottom: 10px; }
+.status-msg { padding: 8px 12px; border-radius: 6px; font-size: 11px; margin-top: 6px; display: none; }
+.status-msg.show { display: block; }
+.status-success { background: #e8f8ef; color: #07c160; }
+.status-error { background: #ffeef0; color: #ff4757; }
+.status-info { background: #f0f7ff; color: #667eea; }
 @media (max-width: 768px) {
   .container { flex-direction: column; }
   .sidebar { width: 100%; }
@@ -68,8 +83,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 <body>
 
 <div class="header">
-  <h1>📰 海外搞钱内参</h1>
-  <p>每天自动抓取海外AI/赚钱/跨境干货 · 一键改写成多平台文案</p>
+  <h1>📰 海外搞钱内参 · 双平台工具</h1>
+  <p>公众号实操干货 + 今日头条热点资讯 · 一键改写 · 自动配封面 · 发布物料包</p>
 </div>
 
 <div class="container">
@@ -77,8 +92,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
     <div class="card">
       <h3>⚙️ 设置</h3>
       <div class="setting-row">
-        <label>Groq API Key（改写用，存在本地浏览器）</label>
+        <label>Groq API Key（改写用）</label>
         <input type="password" id="groqKey" placeholder="gsk_xxxxxxxx">
+      </div>
+      <div class="setting-row">
+        <label>GitHub Token（手动抓取用）</label>
+        <input type="password" id="githubToken" placeholder="ghp_xxxxxxxx">
       </div>
       <div class="setting-row">
         <label>改写模型</label>
@@ -86,8 +105,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
           <option value="auto">自动选择（推荐）</option>
         </select>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="saveKey()">保存 Key</button>
-      <button class="btn btn-secondary btn-sm" id="refreshBtn" onclick="refreshArticles()">🔄 刷新文章</button>
+      <div class="btn-group">
+        <button class="btn btn-primary btn-sm" onclick="saveKeys()">保存 Key</button>
+        <button class="btn btn-secondary btn-sm" onclick="refreshArticles()">刷新文章</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🎯 手动抓取（每次3-4篇）</h3>
+      <div class="fetch-btns">
+        <button class="btn btn-gzh" onclick="manualFetch('gzh')">🧰 抓公众号素材</button>
+        <button class="btn btn-tt" onclick="manualFetch('tt')">🔥 抓头条热点</button>
+      </div>
+      <div class="status-msg" id="fetchStatus"></div>
+      <div style="font-size:10px;color:#999;margin-top:6px;">
+        公众号：开源工具/免费软件/自动化实操/避坑<br>
+        头条：AI行业热点/科技新闻/平台政策/圈内动态
+      </div>
     </div>
 
     <div class="card">
@@ -102,6 +136,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
     <div class="tabs">
       <div class="tab active" onclick="switchTab('original')">📄 原文</div>
       <div class="tab" onclick="switchTab('rewrite')">✏️ 改写</div>
+      <div class="tab" onclick="switchTab('cover')">🎨 封面</div>
+      <div class="tab" onclick="switchTab('publish')">📤 发布物料</div>
     </div>
 
     <div id="originalTab">
@@ -117,16 +153,42 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
       <div class="card rewrite-panel">
         <h3>✏️ 一键改写</h3>
         <div class="style-btns" id="styleBtns">
-          <div class="style-btn active" data-style="shortvideo">短视频口播文案</div>
+          <div class="style-btn active" data-style="gongzhonghao">公众号长文</div>
+          <div class="style-btn" data-style="wechat">微信爆款文</div>
+          <div class="style-btn" data-style="toutiao">今日头条爆款版</div>
           <div class="style-btn" data-style="xiaohongshu">小红书笔记</div>
-          <div class="style-btn" data-style="wechat">微信爆款文</div><div class="style-btn" data-style="gongzhonghao">公众号文章</div>
+          <div class="style-btn" data-style="shortvideo">短视频口播</div>
           <div class="style-btn" data-style="zhihu">知乎回答</div>
-          <div class="style-btn" data-style="tweet">推特/微博</div>
           <div class="style-btn" data-style="summary">超精简摘要</div>
         </div>
         <button class="btn btn-primary" id="rewriteBtn" onclick="doRewrite()" disabled>请先选择文章</button>
         <button class="btn btn-secondary" onclick="copyRewrite()" style="margin-left:8px;">复制结果</button>
         <div class="rewrite-output" id="rewriteOutput"></div>
+      </div>
+    </div>
+
+    <div id="coverTab" style="display:none;">
+      <div class="card cover-section">
+        <h3>🎨 封面图生成（提示词）</h3>
+        <p style="font-size:12px;color:#666;margin-bottom:10px;">根据文章内容自动生成高点击封面图提示词，复制到绘图工具即可出图</p>
+        <div class="cover-btns">
+          <div class="cover-btn active" data-size="toutiao" onclick="selectCoverSize(this)">今日头条 9:16</div>
+          <div class="cover-btn" data-size="xiaohongshu" onclick="selectCoverSize(this)">小红书 3:4</div>
+          <div class="cover-btn" data-size="gongzhonghao" onclick="selectCoverSize(this)">公众号头图 47:10</div>
+          <div class="cover-btn" data-size="shipinhao" onclick="selectCoverSize(this)">视频号 9:16</div>
+        </div>
+        <button class="btn btn-primary" id="coverBtn" onclick="generateCover()" disabled>请先选择文章</button>
+        <button class="btn btn-secondary" onclick="copyCover()" style="margin-left:8px;">复制提示词</button>
+        <div class="cover-prompt" id="coverPrompt"></div>
+      </div>
+    </div>
+
+    <div id="publishTab" style="display:none;">
+      <div class="card">
+        <h3>📤 发布物料包（一键复制）</h3>
+        <p style="font-size:12px;color:#666;margin-bottom:10px;">包含标题、正文、话题标签、封面提示词，复制后直接粘贴到平台后台发布</p>
+        <button class="btn btn-primary" id="publishBtn" onclick="generatePublishKit()" disabled>请先选择文章</button>
+        <div class="rewrite-output" id="publishOutput"></div>
       </div>
     </div>
   </div>
@@ -137,27 +199,34 @@ const REPO = 'mj65-cmd/overseas-news-fetcher';
 const BRANCH = 'main';
 let articles = [];
 let currentArticle = null;
-let currentStyle = 'shortvideo';
+let currentStyle = 'gongzhonghao';
+let currentCoverSize = 'toutiao';
 
-// 改写风格提示词
 const STYLE_PROMPTS = {
-  wechat: '把下面这篇文章改写成一篇微信公众号爆款干货文。【最重要原则：真实不虚构】只基于原文改写，原文没有的数字/工具/人名绝对不能自己加，信息不够就写原文未提及。\n\n严格要求：\n1. 第一行是标题（必须有钩子，用悬念/反差/数字/痛点，比如"买域名就能躺赚？他靠捡漏倒闭网站的域名月入5万""那个靠AI月入10万的普通人，做对了什么？"）\n2. 第二行空一行\n3. 开头用场景或痛点引入，制造好奇（2-3句话）\n4. 正文用故事化方式写，有人物、有过程、有结果，分小标题段落，段落之间空一行\n5. 必须有具体数字、具体工具名、具体操作步骤，越细越好\n6. 结尾有"普通人能抄什么"，列出3个马上能上手的行动点\n7. 最后一句话总结或行动号召\n8. 语言大白话，像跟朋友聊天，不要官方腔\n9. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
-  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。\n\n严格要求：\n1. 第一行是标题（有钩子，用悬念/反差/数字/痛点）\n2. 第二行空一行\n3. 正文分成2-3个小段落，每段之间空一行\n4. 前5秒必须有钩子，口语化，像跟朋友聊天\n5. 结尾留互动引导\n6. 不要用任何markdown符号、星号、井号、特殊符号，直接写纯文本，段落之间用空行分隔',
-  xiaohongshu: '把下面这篇文章改写成小红书笔记。\n\n严格要求：\n1. 第一行是标题（20字以内，有钩子+emoji，用数字/反差/痛点）\n2. 第二行空一行\n3. 正文分成3-5个小点，每个点用emoji开头，点与点之间空一行\n4. 语言活泼接地气，多用"姐妹们""绝了""谁懂啊"\n5. 最后一行是3-5个话题标签（#标签1 #标签2）\n6. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
-  gongzhonghao: '把下面这篇文章改写成公众号文章。\n\n严格要求：\n1. 第一行是文章标题（有吸引力，用悬念/数字/反差）\n2. 第二行空一行\n3. 正文分成3-5个小标题段落，每个小标题单独一行，后面跟正文，段落之间空一行\n4. 开头场景化引入，制造痛点或好奇\n5. 结尾总结+行动号召\n6. 语言专业但不枯燥\n7. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
-  zhihu: '把下面这篇文章改写成知乎回答风格。\n\n严格要求：\n1. 第一行是标题或核心观点\n2. 第二行空一行\n3. 正文分成3-5个论点，每个论点有小标题，段落之间空一行\n4. 有数据有案例，逻辑严谨\n5. 结尾总结\n6. 不要用任何markdown符号、星号、井号，直接写纯文本，段落之间用空行分隔',
-  tweet: '把下面这篇文章改写成3-5条推特/微博线程。\n\n严格要求：\n1. 每条单独一段，条与条之间空一行\n2. 第一条抓眼球，用悬念或数字\n3. 中间逐条展开干货\n4. 最后一条总结+互动\n5. 每条不超过140字，用数字和emoji分隔\n6. 不要用任何markdown符号、星号、井号，直接写纯文本',
-  summary: '把下面这篇文章压缩成3句话的超精简摘要。\n\n严格要求：\n1. 第一句说核心事件\n2. 第二句说关键数据/方法\n3. 第三句说对普通人的意义\n4. 三句话之间空一行\n5. 不要用任何markdown符号、星号、井号，直接写纯文本'
+  gongzhonghao: '把下面这篇文章改写成一篇公众号深度长文。要求：1）标题有吸引力，用悬念/数字/反差；2）开头场景化引入；3）正文分小标题，逻辑清晰，有深度；4）重点写具体操作步骤、工具用法、避坑点；5）结尾总结+行动号召；6）语言专业但不枯燥；7）只基于原文，不虚构。输出纯文本，段落用空行分隔。',
+  wechat: '把下面这篇文章改写成微信公众号爆款干货文。【最重要原则：真实不虚构】只基于原文改写。要求：1）标题必须有钩子，用悬念/反差/数字/痛点；2）开头用场景或痛点引入；3）正文故事化，有人物、有过程、有结果，分小标题；4）必须有具体数字、具体工具名、具体操作步骤；5）结尾有"普通人能抄什么"，列3个行动点；6）最后一句话总结；7）语言大白话，像跟朋友聊天。输出纯文本，段落用空行分隔。',
+  toutiao: '把下面这篇文章改写成今日头条爆款文。【最重要原则：真实不虚构】只基于原文改写。要求：1）标题必须强冲突、强钩子，用"为什么""竟然""别再""注意了"这类词，搭配数字；2）开头3句话必须抛出核心观点或冲突，让读者想继续看；3）正文段落极短，每段1-3句话，适合手机阅读；4）重点写：发生了什么、为什么重要、对普通人有什么影响、具体怎么用；5）如果是热点资讯，写清楚时间、人物、事件、影响；6）如果是干货移植，前置利益点，砍掉冗余步骤；7）结尾加一句互动提问，引导评论；8）语言口语化，有情绪，有观点。输出纯文本，段落用空行分隔。',
+  xiaohongshu: '把下面这篇文章改写成小红书笔记。要求：1）标题20字以内，有钩子+emoji，用数字/反差/痛点；2）正文分3-5个小点，每个点用emoji开头，点与点之间空一行；3）语言活泼接地气，多用"姐妹们""绝了""谁懂啊"；4）最后一行是3-5个话题标签；5）只基于原文，不虚构。输出纯文本。',
+  shortvideo: '把下面这篇文章改写成150字左右的短视频口播文案。要求：1）标题有钩子；2）前5秒必须有钩子（悬念/痛点/反常识）；3）口语化，像跟朋友聊天；4）只说最干的货；5）结尾留互动引导；6）只基于原文，不虚构。输出纯文本，段落用空行分隔。',
+  zhihu: '把下面这篇文章改写成知乎回答风格。要求：1）开头直接抛出观点或"谢邀"；2）正文分3-5个论点，每个论点有小标题，段落之间空一行；3）有数据有案例，逻辑严谨；4）结尾总结；5）只基于原文，不虚构。输出纯文本。',
+  summary: '把下面这篇文章压缩成3句话的超精简摘要。要求：1）第一句说核心事件；2）第二句说关键数据/方法；3）第三句说对普通人的意义；4）三句话之间空一行；5）只基于原文，不虚构。输出纯文本。'
 };
 
-// 初始化
+const COVER_SIZES = {
+  toutiao: { name: '今日头条', ratio: '9:16', desc: '竖版，适合头条信息流' },
+  xiaohongshu: { name: '小红书', ratio: '3:4', desc: '竖版，适合小红书图文' },
+  gongzhonghao: { name: '公众号头图', ratio: '47:10', desc: '横版，适合公众号封面' },
+  shipinhao: { name: '视频号', ratio: '9:16', desc: '竖版，适合视频号封面' }
+};
+
 window.onload = function() {
-  const savedKey = localStorage.getItem('groq_key');
-  if (savedKey) document.getElementById('groqKey').value = savedKey;
+  const savedGroq = localStorage.getItem('groq_key');
+  const savedGithub = localStorage.getItem('github_token');
+  if (savedGroq) document.getElementById('groqKey').value = savedGroq;
+  if (savedGithub) document.getElementById('githubToken').value = savedGithub;
   loadModels();
   refreshArticles();
   
-  // 风格按钮
   document.querySelectorAll('.style-btn').forEach(btn => {
     btn.onclick = function() {
       document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
@@ -167,9 +236,11 @@ window.onload = function() {
   });
 };
 
-function saveKey() {
-  const key = document.getElementById('groqKey').value.trim();
-  localStorage.setItem('groq_key', key);
+function saveKeys() {
+  const groqKey = document.getElementById('groqKey').value.trim();
+  const githubToken = document.getElementById('githubToken').value.trim();
+  localStorage.setItem('groq_key', groqKey);
+  localStorage.setItem('github_token', githubToken);
   alert('Key 已保存到本地浏览器');
   loadModels();
 }
@@ -186,7 +257,7 @@ async function loadModels() {
       const select = document.getElementById('modelSelect');
       select.innerHTML = '<option value="auto">自动选择（推荐）</option>';
       data.data.forEach(m => {
-        if (!m.id.includes('guard') && !m.id.includes('safeguard') && !m.id.includes('whisper')) {
+        if (!m.id.includes('guard') && !m.id.includes('safeguard') && !m.id.includes('whisper') && !m.id.includes('canopylabs')) {
           const opt = document.createElement('option');
           opt.value = m.id;
           opt.textContent = m.id;
@@ -197,6 +268,92 @@ async function loadModels() {
   } catch(e) { console.log('load models error', e); }
 }
 
+async function manualFetch(type) {
+  const token = document.getElementById('githubToken').value.trim() || localStorage.getItem('github_token');
+  if (!token) {
+    alert('请先在设置里填写并保存 GitHub Token');
+    return;
+  }
+  const statusEl = document.getElementById('fetchStatus');
+  const typeName = type === 'gzh' ? '公众号实操干货' : '今日头条热点资讯';
+  statusEl.className = 'status-msg status-info show';
+  statusEl.textContent = `正在触发抓取 ${typeName} 任务...`;
+  
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/news-crawl.yml/dispatches`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ ref: BRANCH, inputs: { source_type: type } })
+    });
+    if (resp.ok) {
+      statusEl.className = 'status-msg status-success show';
+      statusEl.textContent = `✅ 已触发 ${typeName} 抓取，约2-3分钟后点"刷新文章"查看结果`;
+    } else {
+      const err = await resp.text();
+      statusEl.className = 'status-msg status-error show';
+      statusEl.textContent = '❌ 触发失败: ' + err.substring(0, 150);
+    }
+  } catch(e) {
+    statusEl.className = 'status-msg status-error show';
+    statusEl.textContent = '❌ 触发失败: ' + e.message;
+  }
+}
+
+async function refreshArticles() {
+  const listEl = document.getElementById('articleList');
+  const btn = document.querySelector('button[onclick="refreshArticles()"]');
+  const oldCount = articles.length;
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ 刷新中...'; }
+  listEl.innerHTML = '<div class="loading">正在加载最新文章...</div>';
+  try {
+    let indexResp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/index.json?t=${Date.now()}`);
+    if (indexResp.ok) {
+      articles = await indexResp.json();
+    } else {
+      const resp = await fetch(`https://api.github.com/repos/${REPO}/contents/output/articles?ref=${BRANCH}`);
+      const data = await resp.json();
+      articles = data.filter(f => f.name.endsWith('.md') && f.name !== 'processed.txt').map(f => ({
+        name: f.name, title: f.name.replace(/_/g,' ').replace('.md',''),
+        size: f.size, created_at: new Date().toISOString(), source_type: 'unknown'
+      }));
+    }
+    
+    if (articles.length === 0) {
+      listEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:12px;">暂无文章，点上方按钮手动抓取</div>';
+      if (btn) { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }
+      return;
+    }
+    
+    articles.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    const now = Date.now();
+    listEl.innerHTML = articles.map((a, i) => {
+      const isNew = (now - new Date(a.created_at).getTime()) < 24 * 3600 * 1000;
+      const dateStr = formatChineseTime(a.created_at);
+      const tagClass = a.source_type === 'gzh' ? 'tag-gzh' : a.source_type === 'tt' ? 'tag-tt' : 'tag-unknown';
+      const tagText = a.source_type === 'gzh' ? '公众号' : a.source_type === 'tt' ? '头条' : '未知';
+      const newBadge = isNew ? ' <span style="color:#667eea;font-weight:600;font-size:10px;">NEW</span>' : '';
+      return `<div class="article-item" onclick="selectArticle(${i})" id="item-${i}">
+        <div class="title">${(a.title||'').substring(0,55)}${(a.title||'').length>55?'...':''}${newBadge}</div>
+        <div class="meta"><span class="tag ${tagClass}">${tagText}</span><span>${(a.size/1024).toFixed(1)}KB · ${dateStr}</span></div>
+      </div>`;
+    }).join('');
+    
+    const newCount = articles.length - oldCount;
+    if (btn) {
+      if (newCount > 0) btn.textContent = `✅ 已更新 (+${newCount})`;
+      else if (oldCount > 0) btn.textContent = `✅ 已是最新 (${articles.length}篇)`;
+      else btn.textContent = `✅ 加载完成 (${articles.length}篇)`;
+      setTimeout(() => { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }, 2500);
+    }
+  } catch(e) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:red;font-size:12px;">加载失败: ' + e.message + '</div>';
+    if (btn) { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }
+  }
+}
 
 function formatChineseTime(dateStr) {
   if (!dateStr) return '未知';
@@ -204,12 +361,10 @@ function formatChineseTime(dateStr) {
   if (isNaN(date.getTime())) return '未知';
   const now = new Date();
   const diffMs = now - date;
-  if (diffMs < 0) return '刚刚';
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const hours = String(date.getHours()).padStart(2, '0');
   const mins = String(date.getMinutes()).padStart(2, '0');
-  
   if (diffHours < 1) return '刚刚';
   if (diffHours < 24) return '今天 ' + hours + ':' + mins;
   if (diffDays === 1) return '昨天 ' + hours + ':' + mins;
@@ -218,76 +373,12 @@ function formatChineseTime(dateStr) {
   return (date.getMonth()+1) + '月' + date.getDate() + '日';
 }
 
-async function refreshArticles() {
-  const listEl = document.getElementById('articleList');
-  const btn = document.getElementById('refreshBtn');
-  const oldCount = articles.length;
-  btn.disabled = true;
-  btn.textContent = '⏳ 刷新中...';
-  listEl.innerHTML = '<div class="loading">正在加载最新文章...</div>';
-  try {
-    // 优先读索引文件（有准确时间）
-    let indexResp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/index.json?t=${Date.now()}`);
-    if (indexResp.ok) {
-      articles = await indexResp.json();
-    } else {
-      //  fallback: 读目录列表
-      const resp = await fetch(`https://api.github.com/repos/${REPO}/contents/output/articles?ref=${BRANCH}`);
-      const data = await resp.json();
-      articles = data.filter(f => f.name.endsWith('.md') && f.name !== 'processed.txt').map(f => ({
-        name: f.name,
-        title: f.name.replace(/_/g,' ').replace('.md',''),
-        size: f.size,
-        created_at: new Date().toISOString()
-      }));
-    }
-    
-    if (articles.length === 0) {
-      listEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:13px;">暂无文章</div>';
-      btn.textContent = '🔄 刷新文章';
-      btn.disabled = false;
-      return;
-    }
-    
-    const now = Date.now();
-    listEl.innerHTML = articles.map((a, i) => {
-      const articleTime = new Date(a.created_at).getTime();
-      const isNew = (now - articleTime) < 24 * 3600 * 1000;
-      const dateStr = formatChineseTime(a.created_at);
-      const newBadge = isNew ? ' <span style="color:#667eea;font-weight:600;">NEW</span>' : '';
-      const displayTitle = a.title || a.name.replace(/_/g,' ').replace('.md','');
-      return `
-      <div class="article-item ${isNew ? 'new' : ''}" onclick="selectArticle(${i})" id="item-${i}">
-        <div class="title">${displayTitle.substring(0,60)}${displayTitle.length>60?'...':''}${newBadge}</div>
-        <div class="meta">${(a.size/1024).toFixed(1)} KB</div>
-        <div class="date">${dateStr}</div>
-      </div>`;
-    }).join('');
-    
-    const newCount = articles.length - oldCount;
-    if (newCount > 0) {
-      btn.textContent = `✅ 已更新 (+${newCount}篇)`;
-    } else if (oldCount > 0) {
-      btn.textContent = `✅ 已是最新 (${articles.length}篇)`;
-    } else {
-      btn.textContent = `✅ 加载完成 (${articles.length}篇)`;
-    }
-    setTimeout(() => { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }, 2500);
-  } catch(e) {
-    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:red;font-size:13px;">加载失败: ' + e.message + '</div>';
-    btn.textContent = '❌ 刷新失败';
-    setTimeout(() => { btn.textContent = '🔄 刷新文章'; btn.disabled = false; }, 2000);
-  }
-}
-
 async function selectArticle(index) {
   document.querySelectorAll('.article-item').forEach(el => el.classList.remove('active'));
   document.getElementById('item-' + index).classList.add('active');
-  
   currentArticle = articles[index];
   const contentEl = document.getElementById('articleContent');
   contentEl.innerHTML = '<div class="loading">加载文章内容...</div>';
-  
   try {
     const url = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(articles[index].name)}?t=${Date.now()}`;
     const resp = await fetch(url);
@@ -295,6 +386,10 @@ async function selectArticle(index) {
     contentEl.innerHTML = markdownToHtml(text);
     document.getElementById('rewriteBtn').disabled = false;
     document.getElementById('rewriteBtn').textContent = '开始改写';
+    document.getElementById('coverBtn').disabled = false;
+    document.getElementById('coverBtn').textContent = '生成封面提示词';
+    document.getElementById('publishBtn').disabled = false;
+    document.getElementById('publishBtn').textContent = '生成发布物料包';
   } catch(e) {
     contentEl.innerHTML = '<div class="empty-state">加载失败</div>';
   }
@@ -312,175 +407,138 @@ function markdownToHtml(md) {
     .replace(/^\d+\. (.*$)/gm, '<li>$1</li>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>');
-  
-  // 包裹列表
   html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
   html = html.replace(/<\/ul><ul>/g, '');
-  
-  // 处理表格（简单处理）
-  if (html.includes('|')) {
-    const lines = md.split('\n');
-    let tableHtml = '';
-    let inTable = false;
-    let tableRows = [];
-    for (let line of lines) {
-      if (line.trim().startsWith('|') && line.includes('|')) {
-        inTable = true;
-        tableRows.push(line);
-      } else if (inTable) {
-        tableHtml += renderTable(tableRows);
-        tableRows = [];
-        inTable = false;
-      }
-    }
-    if (tableRows.length) tableHtml += renderTable(tableRows);
-    if (tableHtml) {
-      html = html.replace(/<p>[\s\S]*?<\/p>/g, function(match) {
-        if (match.includes('|')) return tableHtml;
-        return match;
-      });
-    }
-  }
-  
   return '<p>' + html + '</p>';
-}
-
-function renderTable(rows) {
-  if (rows.length < 2) return '';
-  const headers = rows[0].split('|').filter(c => c.trim());
-  const body = rows.slice(2).map(r => r.split('|').filter(c => c.trim()));
-  let html = '<table><tr>';
-  headers.forEach(h => html += `<th>${h.trim()}</th>`);
-  html += '</tr>';
-  body.forEach(row => {
-    html += '<tr>';
-    row.forEach(c => html += `<td>${c.trim()}</td>`);
-    html += '</tr>';
-  });
-  html += '</table>';
-  return html;
 }
 
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  if (tab === 'original') {
-    document.querySelectorAll('.tab')[0].classList.add('active');
-    document.getElementById('originalTab').style.display = 'block';
-    document.getElementById('rewriteTab').style.display = 'none';
-  } else {
-    document.querySelectorAll('.tab')[1].classList.add('active');
-    document.getElementById('originalTab').style.display = 'none';
-    document.getElementById('rewriteTab').style.display = 'block';
-  }
+  document.getElementById('originalTab').style.display = 'none';
+  document.getElementById('rewriteTab').style.display = 'none';
+  document.getElementById('coverTab').style.display = 'none';
+  document.getElementById('publishTab').style.display = 'none';
+  if (tab === 'original') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('originalTab').style.display = 'block'; }
+  if (tab === 'rewrite') { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('rewriteTab').style.display = 'block'; }
+  if (tab === 'cover') { document.querySelectorAll('.tab')[2].classList.add('active'); document.getElementById('coverTab').style.display = 'block'; }
+  if (tab === 'publish') { document.querySelectorAll('.tab')[3].classList.add('active'); document.getElementById('publishTab').style.display = 'block'; }
 }
-
 
 function cleanText(text) {
   return text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
+    .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
     .replace(/[\u200B-\u200F\u2028-\u202F\uFEFF]/g, '')
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '')
-    .replace(/^[ \t]+/gm, '')
-    .replace(/[ \t]+$/gm, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+    .replace(/^[ \t]+/gm, '').replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n').trim();
 }
 
 async function doRewrite() {
   const key = document.getElementById('groqKey').value.trim() || localStorage.getItem('groq_key');
-  if (!key) { alert('请先在左侧填写并保存 Groq API Key'); return; }
+  if (!key) { alert('请先填写并保存 Groq API Key'); return; }
   if (!currentArticle) { alert('请先选择一篇文章'); return; }
-  
   const btn = document.getElementById('rewriteBtn');
   const output = document.getElementById('rewriteOutput');
-  btn.disabled = true;
-  btn.textContent = '改写中...';
-  output.classList.add('show');
-  output.textContent = '正在调用 AI 改写，请稍候...';
-  
+  btn.disabled = true; btn.textContent = '改写中...';
+  output.classList.add('show'); output.textContent = '正在调用 AI 改写，请稍候...';
   try {
     const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(currentArticle.name)}?t=${Date.now()}`);
     const originalText = await resp.text();
-    
-    // 获取可用模型列表，按优先级排序
-    const modelsResp = await fetch('https://api.groq.com/openai/v1/models', {
-      headers: { 'Authorization': 'Bearer ' + key }
-    });
+    const modelsResp = await fetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': 'Bearer ' + key } });
     const modelsData = await modelsResp.json();
     const available = modelsData.data.map(m => m.id);
     const priority = ['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'groq/compound', 'groq/compound-mini', 'allam-2-7b'];
     const modelList = priority.filter(m => available.includes(m));
-    if (modelList.length === 0) {
-      modelList.push(available.find(m => !m.includes('guard') && !m.includes('whisper') && !m.includes('canopylabs') && !m.includes('orpheus')) || 'mixtral-8x7b-32768');
-    }
-    
+    if (modelList.length === 0) modelList.push(available.find(m => !m.includes('guard') && !m.includes('whisper') && !m.includes('canopylabs')) || 'mixtral-8x7b-32768');
     const systemPrompt = STYLE_PROMPTS[currentStyle];
     let lastError = '';
-    
-    // 逐个模型尝试，遇到限流自动切换
     for (let i = 0; i < modelList.length; i++) {
       const model = modelList[i];
       output.textContent = `正在用 ${model} 改写... (${i+1}/${modelList.length})`;
-      
       try {
         const groqResp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
-          headers: {
-            'Authorization': 'Bearer ' + key,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: model,
-            temperature: 0.7,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: '原文：\n' + originalText.substring(0, 15000) }
-            ]
-          })
+          headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: model, temperature: 0.7, messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: '原文：\n' + originalText.substring(0, 12000) }
+          ]})
         });
-        
-        if (groqResp.status === 429) {
-          lastError = '模型 ' + model + ' 限流，自动切换下一个...';
-          output.textContent = lastError;
-          await new Promise(r => setTimeout(r, 2000));
-          continue;
-        }
-        
-        if (!groqResp.ok) {
-          const err = await groqResp.text();
-          lastError = '改写失败 (' + model + '): ' + err.substring(0, 200);
-          continue;
-        }
-        
+        if (groqResp.status === 429) { lastError = '模型 ' + model + ' 限流，切换下一个...'; output.textContent = lastError; await new Promise(r => setTimeout(r, 2000)); continue; }
+        if (!groqResp.ok) { lastError = '改写失败 (' + model + '): ' + (await groqResp.text()).substring(0, 200); continue; }
         const data = await groqResp.json();
         output.textContent = cleanText(data.choices[0].message.content);
         return;
-      } catch(e) {
-        lastError = '模型 ' + model + ' 出错: ' + e.message;
-        continue;
-      }
+      } catch(e) { lastError = '模型 ' + model + ' 出错: ' + e.message; continue; }
     }
-    
     output.textContent = '所有模型都暂时不可用，请稍后再试。最后错误: ' + lastError;
-    
   } catch(e) {
     output.textContent = '改写出错: ' + e.message;
   } finally {
-    btn.disabled = false;
-    btn.textContent = '开始改写';
+    btn.disabled = false; btn.textContent = '开始改写';
   }
 }
 
 function copyRewrite() {
-  const text = cleanText(document.getElementById('rewriteOutput').textContent);
-  if (!text || text.includes('正在调用') || text.includes('失败') || text.includes('出错')) {
-    alert('没有可复制的内容');
-    return;
+  const text = document.getElementById('rewriteOutput').textContent;
+  if (!text || text.includes('正在') || text.includes('失败') || text.includes('出错')) { alert('没有可复制的内容'); return; }
+  navigator.clipboard.writeText(text).then(() => alert('已复制到剪贴板'));
+}
+
+function selectCoverSize(btn) {
+  document.querySelectorAll('.cover-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCoverSize = btn.dataset.size;
+}
+
+async function generateCover() {
+  if (!currentArticle) { alert('请先选择一篇文章'); return; }
+  const output = document.getElementById('coverPrompt');
+  const btn = document.getElementById('coverBtn');
+  btn.disabled = true; btn.textContent = '生成中...';
+  output.classList.add('show');
+  try {
+    const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(currentArticle.name)}?t=${Date.now()}`);
+    const text = await resp.text();
+    const size = COVER_SIZES[currentCoverSize];
+    const titleMatch = text.match(/^# (.+)$/m);
+    const title = titleMatch ? titleMatch[1] : currentArticle.title;
+    const prompt = `【${size.name}封面图提示词】\n\n尺寸比例：${size.ratio}（${size.desc}）\n\n风格：自媒体爆款大字报风格，高点击率，深色背景+高对比大字+科技感元素\n\n主标题：${title.substring(0, 30)}\n\n视觉元素：\n- 大号加粗中文标题，占据画面上半部分\n- 副标题/关键词：免费工具、开源软件、实操干货、普通人可复制\n- 背景：深色科技感渐变，带电脑界面、代码、工具图标等元素\n- 配色：深蓝/紫色为主，黄色/橙色高亮关键词\n- 整体感觉：专业、干货、有冲击力、让人想点击\n\n负面提示：不要人物照片，不要真实人脸，不要复杂场景，不要低分辨率，不要水印\n\n（复制以上提示词到Midjourney/Stable Diffusion/即梦等绘图工具即可生成封面）`;
+    output.textContent = prompt;
+  } catch(e) {
+    output.textContent = '生成失败: ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = '生成封面提示词';
   }
-  navigator.clipboard.writeText(text).then(() => {
-    alert('已复制到剪贴板');
-  });
+}
+
+function copyCover() {
+  const text = document.getElementById('coverPrompt').textContent;
+  if (!text || text.includes('生成中') || text.includes('失败')) { alert('没有可复制的内容'); return; }
+  navigator.clipboard.writeText(text).then(() => alert('封面提示词已复制'));
+}
+
+async function generatePublishKit() {
+  if (!currentArticle) { alert('请先选择一篇文章'); return; }
+  const output = document.getElementById('publishOutput');
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true; btn.textContent = '生成中...';
+  output.classList.add('show');
+  output.textContent = '正在生成发布物料包...';
+  try {
+    const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/articles/${encodeURIComponent(currentArticle.name)}?t=${Date.now()}`);
+    const text = await resp.text();
+    const titleMatch = text.match(/^# (.+)$/m);
+    const title = titleMatch ? titleMatch[1] : currentArticle.title;
+    const sourceMatch = text.match(/^来源：(.+)$/m);
+    const source = sourceMatch ? sourceMatch[1] : '';
+    const kit = `========== 发布物料包 ==========\n\n【文章标题】\n${title}\n\n【来源类型】\n${source}\n\n【正文】\n${cleanText(text.substring(text.indexOf('\n\n') + 2))}\n\n【推荐话题标签】\n#开源工具 #免费软件 #AI工具 #自媒体实操 #效率神器 #副业避坑 #普通人可复制 #亲测有效\n\n【封面提示词】\n根据文章标题生成${COVER_SIZES[currentCoverSize].name}（${COVER_SIZES[currentCoverSize].ratio}）封面，大字报风格，深色背景，高对比标题，科技感元素\n\n【发布建议】\n1. 标题可根据平台风格再优化\n2. 正文段落可根据平台阅读习惯再拆分\n3. 标签可根据平台热点调整\n4. 封面用提示词到绘图工具生成后上传\n\n========== 物料包结束 ==========`;
+    output.textContent = kit;
+  } catch(e) {
+    output.textContent = '生成失败: ' + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = '生成发布物料包';
+  }
 }
 </script>
 </body>
