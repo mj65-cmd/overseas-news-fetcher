@@ -9,7 +9,8 @@ OUTPUT_FOLDER = BASE / "output" / "articles"
 OUTPUT_FOLDER.mkdir(exist_ok=True, parents=True)
 PROCESSED_FILE = OUTPUT_FOLDER / "processed.txt"
 
-MAX_ARTICLES = 5
+MAX_ARTICLES = 4
+SOURCE_TYPE = os.environ.get("SOURCE_TYPE", "gzh")
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 JINA_KEY = os.environ.get("JINA_API_KEY", "")
@@ -67,6 +68,9 @@ def detect_model():
 
 detect_model()
 
+source_file = "sources_gzh.json" if SOURCE_TYPE == "gzh" else "sources_tt.json"
+SOURCES_PATH = BASE / "config" / source_file
+print(f"抓取类型: {SOURCE_TYPE}, 使用源文件: {source_file}")
 with open(SOURCES_PATH, "r", encoding="utf-8") as f:
     sources = json.load(f)
 with open(BLACKLIST_PATH, "r", encoding="utf-8") as f:
@@ -212,6 +216,7 @@ for category, rss_list in sources.items():
                             "orig_title": title,
                             "chinese_title": chinese_title,
                             "link": link,
+                            "source_type": SOURCE_TYPE,
                             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime())
                         })
                         print(f"  ✅ 完成第 {article_count}/{MAX_ARTICLES} 条")
@@ -251,7 +256,8 @@ for meta in article_meta:
             "name": safe_name,
             "title": meta["chinese_title"],
             "size": f_path.stat().st_size,
-            "created_at": meta["generated_at"]
+            "created_at": meta["generated_at"],
+            "source_type": meta["source_type"]
         })
 
 # 加上之前已有的文章（从文件mtime读取）
@@ -274,7 +280,8 @@ for f in OUTPUT_FOLDER.glob("*.md"):
             "name": f.name,
             "title": chinese_title,
             "size": f.stat().st_size,
-            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime(f.stat().st_mtime))
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%S+08:00", time.localtime(f.stat().st_mtime)),
+            "source_type": "unknown"
         })
     except:
         pass
