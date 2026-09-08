@@ -3,13 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       source_type:
-        description: '抓取类型: gzh(公众号实操干货) / tt(今日头条热点资讯)'
+        description: '抓取类型: gzh(公众号实操干货) / tt(今日头条热点资讯) / food(海外美食视频)'
         required: true
         default: 'gzh'
         type: choice
         options:
           - gzh
           - tt
+          - food
 
 permissions:
   contents: write

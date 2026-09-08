@@ -43,6 +43,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .tag-gzh { background: #e8f8ef; color: #07c160; }
 .tag-tt { background: #ffeef0; color: #ff4757; }
 .tag-unknown { background: #f0f0f0; color: #999; }
+.btn-food { background: #ff8c00; color: white; }
+.btn-food:hover { background: #e67e00; }
+.btn-food:disabled { background: #ccc; cursor: not-allowed; }
+.tag-food { background: #fff3e0; color: #ff8c00; }
+.list-tab { padding: 4px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 11px; cursor: pointer; background: white; transition: all 0.15s; }
+.list-tab:hover { border-color: #667eea; color: #667eea; }
+.list-tab.active { background: #667eea; color: white; border-color: #667eea; }
+.food-detail .food-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; color: #1d1d1f; }
+.food-detail .food-orig-title { font-size: 12px; color: #999; margin-bottom: 6px; }
+.food-detail .food-meta { font-size: 12px; color: #888; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #eee; display: flex; flex-wrap: wrap; gap: 12px; }
+.food-section { margin-bottom: 16px; }
+.food-section h4 { font-size: 13px; color: #333; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+.food-section .content-box { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.7; color: #444; white-space: pre-wrap; margin-bottom: 6px; }
+.food-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.mark-actions { display: flex; gap: 8px; margin-top: 8px; }
+.mark-status { font-size: 12px; margin-top: 6px; padding: 4px 10px; border-radius: 4px; display: inline-block; }
+.mark-status.pass { background: #e8f8ef; color: #07c160; }
+.mark-status.fail { background: #ffeef0; color: #ff4757; }
+.food-list-item .duration-badge { font-size: 10px; color: #ff8c00; font-weight: 600; }
 .article-content { background: white; border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); min-height: 300px; }
 .article-content h1 { font-size: 20px; margin-bottom: 8px; line-height: 1.4; }
 .article-content .article-meta { font-size: 11px; color: #888; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
@@ -107,7 +126,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
       </div>
       <div class="btn-group">
         <button class="btn btn-primary btn-sm" onclick="saveKeys()">保存 Key</button>
-        <button class="btn btn-secondary btn-sm" onclick="refreshArticles()">刷新文章</button>
+        <button class="btn btn-secondary btn-sm" onclick="refreshCurrent()">刷新列表</button>
       </div>
     </div>
 
@@ -117,16 +136,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
         <button class="btn btn-gzh" onclick="manualFetch('gzh')">🧰 抓公众号素材</button>
         <button class="btn btn-tt" onclick="manualFetch('tt')">🔥 抓头条热点</button>
       </div>
+      <div class="fetch-btns">
+        <button class="btn btn-food" onclick="manualFetch('food')" style="flex:1;">🍳 抓海外美食素材</button>
+      </div>
       <div class="status-msg" id="fetchStatus"></div>
       <div style="font-size:10px;color:#999;margin-top:6px;">
         公众号：开源工具/免费软件/自动化实操/避坑<br>
-        头条：AI行业热点/科技新闻/平台政策/圈内动态
+        头条：AI行业热点/科技新闻/平台政策/圈内动态<br>
+        美食：海外本土美食视频，48h内·≥60秒·自动过滤国内账号
       </div>
     </div>
 
     <div class="card">
-      <h3>📝 文章列表</h3>
+      <h3>📝 素材列表</h3>
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button class="list-tab active" id="listTabArticles" onclick="switchList('articles')">📄 文章</button>
+        <button class="list-tab" id="listTabFood" onclick="switchList('food')">🍳 美食素材</button>
+      </div>
       <div class="article-list" id="articleList">
+        <div class="loading">加载中...</div>
+      </div>
+      <div class="article-list" id="foodList" style="display:none;">
         <div class="loading">加载中...</div>
       </div>
     </div>
@@ -189,6 +219,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
         <p style="font-size:12px;color:#666;margin-bottom:10px;">包含标题、正文、话题标签、封面提示词，复制后直接粘贴到平台后台发布</p>
         <button class="btn btn-primary" id="publishBtn" onclick="generatePublishKit()" disabled>请先选择文章</button>
         <div class="rewrite-output" id="publishOutput"></div>
+      </div>
+    </div>
+
+    <div id="foodPanel" style="display:none;">
+      <div class="article-content food-detail" id="foodContent">
+        <div class="empty-state">
+          <div class="icon">🍳</div>
+          <p>从左侧美食素材列表选择一条视频</p>
+        </div>
       </div>
     </div>
   </div>
@@ -275,7 +314,8 @@ async function manualFetch(type) {
     return;
   }
   const statusEl = document.getElementById('fetchStatus');
-  const typeName = type === 'gzh' ? '公众号实操干货' : '今日头条热点资讯';
+  const typeNames = { 'gzh': '公众号实操干货', 'tt': '今日头条热点资讯', 'food': '海外美食视频' };
+  const typeName = typeNames[type] || type;
   statusEl.className = 'status-msg status-info show';
   statusEl.textContent = `正在触发抓取 ${typeName} 任务...`;
   
@@ -539,6 +579,290 @@ async function generatePublishKit() {
   } finally {
     btn.disabled = false; btn.textContent = '生成发布物料包';
   }
+}
+
+// ===== 美食素材模块 =====
+let foodItems = [];
+let currentFoodItem = null;
+let currentList = 'articles';
+
+function refreshCurrent() {
+  if (currentList === 'food') {
+    loadFoodItems();
+  } else {
+    refreshArticles();
+  }
+}
+
+const CATEGORY_NAMES = {
+  home_cooking: '家庭烹饪', street_food: '街头美食', restaurant: '餐厅探店',
+  baking: '烘焙', bbq: '烧烤', dessert: '甜点', quick_recipe: '快手菜',
+  asian_food: '亚洲料理', western_food: '西餐', other: '其他'
+};
+
+// localStorage 辅助
+function getFoodBlacklist() {
+  try { return JSON.parse(localStorage.getItem('food_blacklist') || '[]'); }
+  catch(e) { return []; }
+}
+function addToFoodBlacklist(channelId) {
+  if (!channelId) return;
+  const bl = getFoodBlacklist();
+  if (!bl.includes(channelId)) { bl.push(channelId); localStorage.setItem('food_blacklist', JSON.stringify(bl)); }
+}
+function getFoodMarks() {
+  try { return JSON.parse(localStorage.getItem('food_marks') || '{}'); }
+  catch(e) { return {}; }
+}
+function setFoodMark(videoId, status) {
+  const marks = getFoodMarks();
+  marks[videoId] = { status: status, marked_at: new Date().toISOString() };
+  localStorage.setItem('food_marks', JSON.stringify(marks));
+}
+function getFoodPrefs() {
+  try { return JSON.parse(localStorage.getItem('food_prefs') || '[]'); }
+  catch(e) { return []; }
+}
+function addFoodPref(category) {
+  if (!category) return;
+  const prefs = getFoodPrefs();
+  if (!prefs.includes(category)) { prefs.push(category); localStorage.setItem('food_prefs', JSON.stringify(prefs)); }
+}
+
+function switchList(type) {
+  currentList = type;
+  document.getElementById('listTabArticles').classList.toggle('active', type === 'articles');
+  document.getElementById('listTabFood').classList.toggle('active', type === 'food');
+  document.getElementById('articleList').style.display = type === 'articles' ? 'block' : 'none';
+  document.getElementById('foodList').style.display = type === 'food' ? 'block' : 'none';
+  // 切换主内容区显示
+  const tabs = document.querySelector('.tabs');
+  const foodPanel = document.getElementById('foodPanel');
+  if (type === 'food') {
+    tabs.style.display = 'none';
+    document.getElementById('originalTab').style.display = 'none';
+    document.getElementById('rewriteTab').style.display = 'none';
+    document.getElementById('coverTab').style.display = 'none';
+    document.getElementById('publishTab').style.display = 'none';
+    foodPanel.style.display = 'block';
+    if (foodItems.length === 0) loadFoodItems();
+  } else {
+    tabs.style.display = 'flex';
+    foodPanel.style.display = 'none';
+    document.getElementById('originalTab').style.display = 'block';
+    // 重置tab到原文
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab')[0].classList.add('active');
+  }
+}
+
+async function loadFoodItems() {
+  const listEl = document.getElementById('foodList');
+  listEl.innerHTML = '<div class="loading">正在加载美食素材...</div>';
+  try {
+    const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/output/food/food_index.json?t=${Date.now()}`);
+    if (resp.ok) {
+      foodItems = await resp.json();
+    } else {
+      foodItems = [];
+    }
+  } catch(e) {
+    foodItems = [];
+  }
+  renderFoodList();
+}
+
+function renderFoodList() {
+  const listEl = document.getElementById('foodList');
+  const blacklist = getFoodBlacklist();
+  // 过滤本地黑名单
+  let displayItems = foodItems.filter(item => !blacklist.includes(item.channel_id));
+  // 按题材偏好排序（通过的题材优先）
+  const prefs = getFoodPrefs();
+  if (prefs.length > 0) {
+    displayItems.sort((a, b) => {
+      const aPref = prefs.includes(a.category) ? 0 : 1;
+      const bPref = prefs.includes(b.category) ? 0 : 1;
+      if (aPref !== bPref) return aPref - bPref;
+      return new Date(b.fetched_at) - new Date(a.fetched_at);
+    });
+  } else {
+    displayItems.sort((a, b) => new Date(b.fetched_at) - new Date(a.fetched_at));
+  }
+
+  if (displayItems.length === 0) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:12px;">暂无美食素材，点上方"🍳 抓海外美食素材"按钮抓取</div>';
+    return;
+  }
+
+  const marks = getFoodMarks();
+  const now = Date.now();
+  listEl.innerHTML = displayItems.map((item, i) => {
+    const isNew = (now - new Date(item.fetched_at).getTime()) < 24 * 3600 * 1000;
+    const mark = marks[item.video_id];
+    const markIcon = mark ? (mark.status === 'pass' ? ' ✅' : ' ❌') : '';
+    const newBadge = isNew ? ' <span style="color:#ff8c00;font-weight:600;font-size:10px;">NEW</span>' : '';
+    const catName = CATEGORY_NAMES[item.category] || item.category;
+    return `<div class="article-item food-list-item" onclick="selectFoodItem(${i})" id="food-item-${i}">
+      <div class="title">${(item.tt_title||item.title||'').substring(0,50)}${(item.tt_title||item.title||'').length>50?'...':''}${newBadge}${markIcon}</div>
+      <div class="meta">
+        <span class="tag tag-food">美食素材</span>
+        <span class="duration-badge">⏱ ${item.duration_display}</span>
+        <span>${catName} · ${formatChineseTime(item.published_at || item.fetched_at)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectFoodItem(index) {
+  document.querySelectorAll('.food-list-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('food-item-' + index).classList.add('active');
+  // 重新过滤获取真实索引
+  const blacklist = getFoodBlacklist();
+  let displayItems = foodItems.filter(item => !blacklist.includes(item.channel_id));
+  const prefs = getFoodPrefs();
+  if (prefs.length > 0) {
+    displayItems.sort((a, b) => {
+      const aPref = prefs.includes(a.category) ? 0 : 1;
+      const bPref = prefs.includes(b.category) ? 0 : 1;
+      if (aPref !== bPref) return aPref - bPref;
+      return new Date(b.fetched_at) - new Date(a.fetched_at);
+    });
+  } else {
+    displayItems.sort((a, b) => new Date(b.fetched_at) - new Date(a.fetched_at));
+  }
+  currentFoodItem = displayItems[index];
+  renderFoodDetail(currentFoodItem);
+}
+
+function renderFoodDetail(item) {
+  const contentEl = document.getElementById('foodContent');
+  const catName = CATEGORY_NAMES[item.category] || item.category;
+  const marks = getFoodMarks();
+  const mark = marks[item.video_id];
+  const markHtml = mark ?
+    (mark.status === 'pass' ? '<span class="mark-status pass">✅ 已标记：头条审核通过</span>' : '<span class="mark-status fail">❌ 已标记：头条未通过（该博主已拉黑）</span>')
+    : '<span class="mark-status" style="background:#f0f0f0;color:#999;">未标记</span>';
+
+  contentEl.innerHTML = `
+    <div class="food-title">${escapeHtml(item.tt_title || item.title)}</div>
+    <div class="food-orig-title">原标题：${escapeHtml(item.title)}</div>
+    <div class="food-meta">
+      <span>👤 ${escapeHtml(item.channel_name)}</span>
+      <span>⏱️ ${item.duration_display}</span>
+      <span>📅 ${formatChineseTime(item.published_at || item.fetched_at)}</span>
+      <span>🏷️ ${catName}</span>
+      ${item.view_count ? `<span>👁️ ${item.view_count.toLocaleString()}</span>` : ''}
+    </div>
+    <div class="food-actions">
+      <button class="btn btn-primary btn-sm" onclick="copyFoodLink()">📋 复制原视频链接</button>
+      <button class="btn btn-food btn-sm" onclick="openYt1ss()">⬇️ 去yt1ss下载</button>
+      <a href="${item.video_url}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;display:inline-block;">▶️ 原视频</a>
+    </div>
+    <div class="food-section">
+      <h4>📝 今日头条发布物料</h4>
+      <div style="font-size:11px;color:#999;margin-bottom:3px;">视频标题</div>
+      <div class="content-box" id="foodTitleBox">${escapeHtml(item.tt_title)}</div>
+      <button class="btn btn-secondary btn-sm" onclick="copyFoodField('tt_title','标题')">复制标题</button>
+      <div style="font-size:11px;color:#999;margin:8px 0 3px;">视频简介</div>
+      <div class="content-box" id="foodDescBox">${escapeHtml(item.tt_description)}</div>
+      <button class="btn btn-secondary btn-sm" onclick="copyFoodField('tt_description','简介')">复制简介</button>
+      <div style="font-size:11px;color:#999;margin:8px 0 3px;">话题标签</div>
+      <div class="content-box" id="foodTagsBox">${escapeHtml(item.tt_tags)}</div>
+      <button class="btn btn-secondary btn-sm" onclick="copyFoodField('tt_tags','标签')">复制标签</button>
+      <div style="margin-top:10px;">
+        <button class="btn btn-primary btn-sm" onclick="copyFoodKit()">📦 一键复制全部物料</button>
+      </div>
+    </div>
+    <div class="food-section">
+      <h4>🎨 美食封面提示词</h4>
+      <div class="content-box" id="foodCoverBox">${escapeHtml(item.cover_prompt)}</div>
+      <button class="btn btn-secondary btn-sm" onclick="copyFoodField('cover_prompt','封面提示词')">复制封面提示词</button>
+    </div>
+    <div class="food-section">
+      <h4>🏷️ 头条审核标记</h4>
+      <div class="mark-actions">
+        <button class="btn btn-gzh btn-sm" onclick="markFood('pass')">✅ 审核通过</button>
+        <button class="btn btn-tt btn-sm" onclick="markFood('fail')">❌ 未通过</button>
+      </div>
+      <div id="foodMarkStatus" style="margin-top:6px;">${markHtml}</div>
+      <div style="font-size:10px;color:#999;margin-top:8px;line-height:1.6;">
+        标记"未通过"→ 自动拉黑该博主ID，后续其所有视频不再出现<br>
+        标记"审核通过"→ 记录题材偏好，后续优先推送同类内容
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function copyFoodLink() {
+  if (!currentFoodItem) return;
+  navigator.clipboard.writeText(currentFoodItem.video_url).then(() => alert('原视频链接已复制'));
+}
+
+function openYt1ss() {
+  if (!currentFoodItem) return;
+  const url = `https://yt1ss.pro/en199/?url=${encodeURIComponent(currentFoodItem.video_url)}`;
+  window.open(url, '_blank');
+}
+
+function copyFoodField(field, label) {
+  if (!currentFoodItem) return;
+  const text = currentFoodItem[field] || '';
+  if (!text) { alert('没有可复制的' + label); return; }
+  navigator.clipboard.writeText(text).then(() => alert(label + '已复制'));
+}
+
+function copyFoodKit() {
+  if (!currentFoodItem) return;
+  const item = currentFoodItem;
+  const kit = `========== 头条视频发布物料 ==========
+
+【视频标题】
+${item.tt_title}
+
+【视频简介】
+${item.tt_description}
+
+【话题标签】
+${item.tt_tags}
+
+【原视频链接】
+${item.video_url}
+
+【下载地址】
+https://yt1ss.pro/en199/?url=${encodeURIComponent(item.video_url)}
+
+【封面提示词】
+${item.cover_prompt}
+
+========== 物料包结束 ==========`;
+  navigator.clipboard.writeText(kit).then(() => alert('全部发布物料已复制'));
+}
+
+function markFood(status) {
+  if (!currentFoodItem) return;
+  const item = currentFoodItem;
+  if (status === 'fail') {
+    if (item.channel_id) {
+      addToFoodBlacklist(item.channel_id);
+    }
+    setFoodMark(item.video_id, 'fail');
+    alert('已标记"未通过"\n该博主(' + item.channel_name + ')已加入黑名单，后续视频不再出现');
+  } else {
+    setFoodMark(item.video_id, 'pass');
+    if (item.category) addFoodPref(item.category);
+    alert('已标记"审核通过"\n题材偏好(' + (CATEGORY_NAMES[item.category] || item.category) + ')已记录，后续优先推送同类内容');
+  }
+  // 刷新列表和详情
+  renderFoodList();
+  renderFoodDetail(item);
 }
 </script>
 </body>
