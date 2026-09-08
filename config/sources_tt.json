@@ -1,0 +1,21 @@
+{
+  "AI行业热点": [
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "https://venturebeat.com/category/ai/feed/",
+    "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+  ],
+  "科技行业新闻": [
+    "https://techcrunch.com/feed/",
+    "https://www.theverge.com/rss/index.xml",
+    "https://arstechnica.com/feed/"
+  ],
+  "平台政策/圈内动态": [
+    "https://www.tubefilter.com/feed/",
+    "https://blog.youtube/feed/",
+    "https://newsroom.tiktok.com/en-us/rss.xml"
+  ],
+  "出海/跨境热点": [
+    "https://www.ecommercebytes.com/feed/",
+    "https://www.shopify.com/blog/feed.xml"
+  ]
+}
